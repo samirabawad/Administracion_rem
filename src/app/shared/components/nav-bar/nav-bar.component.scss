@@ -1,208 +1,553 @@
 @import '../../../../styles.scss';
 
-    //oculta nav mobile
+// Oculta nav mobile por defecto
+.nav-item-mobile {
+  display: none;
+}
+
+// Dropdown mejorado
+.dropdown-menu-dark {
+  background-color: #0e2a47;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  
+  .dropdown-item {
+    color: #ffffffcc;
+    font-size: 0.95rem;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #15406b;
+      color: #ffffff;
+    }
+
+    i {
+      width: 16px;
+      text-align: center;
+    }
+  }
+
+  .dropdown-header {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 1.25rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+  }
+
+  .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 0.5rem 0;
+  }
+}
+
+// Dropdown mejorado con descripciones
+.dropdown-menu-enhanced {
+  min-width: 280px;
+  
+  .dropdown-item.enhanced {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem 1.25rem;
+    
+    .dropdown-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.75rem;
+      
+      i {
+        font-size: 1rem;
+        color: #4a90e2;
+      }
+    }
+    
+    .dropdown-content {
+      flex-grow: 1;
+      
+      .dropdown-title {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #ffffff;
+        margin-bottom: 0.2rem;
+      }
+      
+      .dropdown-desc {
+        font-size: 0.75rem;
+        color: #b0b0b0;
+        line-height: 1.3;
+      }
+    }
+    
+    &:hover {
+      .dropdown-icon i {
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+// Navbar principal
+.navbar-lg {
+  padding: 0;
+  margin: 0;
+  background-color: #092039;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .navbar-logo-container {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+  }
+
+  // Estilos para los enlaces
+  .text-underline {
+    text-decoration: underline !important;
+    text-underline-offset: 0.15em;
+    text-decoration-color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      text-decoration: none !important;
+      color: #ffffff;
+    }
+  }
+
+  .navbar-logo {
+    width: auto;
+    height: 80px;
+    max-width: 250px;
+    margin: 0 0 0 5rem;
+    padding: 0;
+    object-fit: contain;
+    display: block;
+  }
+
+  // Botón de menú móvil mejorado
+  .navbar-toggler {
+    min-height: 70px;
+    padding: 0.5rem;
+    font-size: 16px;
+    border: none;
+    color: #fff;
+    background: none;
+    position: relative;
+    
+    &:focus {
+      box-shadow: none;
+      outline: none;
+    }
+    
+    .navbar-toggler-icon-custom {
+      width: 24px;
+      height: 18px;
+      position: relative;
+      display: block;
+      
+      .line {
+        display: block;
+        height: 2px;
+        width: 100%;
+        background-color: #fff;
+        margin: 4px 0;
+        transition: all 0.3s ease-in-out;
+        transform-origin: center;
+        
+        &:first-child.active {
+          transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        &:nth-child(2).active {
+          opacity: 0;
+        }
+        
+        &:last-child.active {
+          transform: rotate(-45deg) translate(7px, -6px);
+        }
+      }
+    }
+    
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+  }
+
+  .navbar-collapse {
+    flex-grow: 0;
+  }
+
+  .navbar-nav {
+    margin-left: auto;
+  }
+
+  .nav-item {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+
+    .nav-link {
+      @extend .body-link-small;
+      @extend .text-underline;
+      color: #fffffffb;
+      position: relative;
+      padding: 0.5rem 0;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #FFFFFF;
+      }
+    }
+
+    // Badges mejorados
+    .badge, .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      padding: 0.25rem 0.5rem;
+      border-radius: 50%;
+      background-color: #dc3545;
+      color: white;
+      font-size: 0.7rem;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    // Íconos mejorados
+    i.bi-cart, i.bi-bell {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
+  // Separadores
+  .nav-separator {
+    width: 1px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin: 0 0.5rem;
+  }
+}
+
+// Notificaciones dropdown
+.notification-dropdown {
+  min-width: 320px;
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 8px 8px 0 0;
+    
+    span {
+      font-weight: 600;
+      color: #495057;
+    }
+  }
+  
+  .notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .notification-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f3f4;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .notification-content {
+      flex-grow: 1;
+      
+      .notification-title {
+        font-weight: 500;
+        color: #212529;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .notification-text {
+        color: #6c757d;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        margin-bottom: 0.25rem;
+      }
+      
+      .notification-time {
+        color: #adb5bd;
+        font-size: 0.7rem;
+      }
+    }
+    
+    .notification-remove {
+      flex-shrink: 0;
+      color: #adb5bd;
+      padding: 0.25rem;
+      
+      &:hover {
+        color: #dc3545;
+      }
+    }
+  }
+  
+  .notification-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #adb5bd;
+    
+    i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+  }
+}
+
+// Usuario dropdown
+.user-dropdown {
+  min-width: 220px;
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .user-avatar {
+      font-size: 2rem;
+      margin-right: 0.75rem;
+      color: #4a90e2;
+    }
+    
+    .user-details {
+      .user-name {
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 0.9rem;
+      }
+      
+      .user-role {
+        color: #b0b0b0;
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// Controles móviles mejorados
+.mobile-controls-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .nav-notification, .nav-user-mobile {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.25rem;
+    padding: 0.5rem;
+    position: relative;
+    
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+// Overlay para móviles
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  display: block;
+}
+
+// Animaciones y transiciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu {
+  animation: fadeIn 0.2s ease-out;
+}
+
+// Responsivo para tablets y móviles
+@media (max-width: 991px) {
+  .navbar-lg {
+    // Contenedor flexible para controles móviles
+    .mobile-controls-container {
+      display: flex !important;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+
+    .nav-item-desktop {
+      display: none;
+    }
+
     .nav-item-mobile {
-          display: none;
-    }
-    .dropdown-menu-dark {
-      background-color: #0e2a47;
+      display: flex !important;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      justify-content: center;
+      color: #fff;
+      min-height: 20px;
+      font-size: 16px;
       border: none;
-      
-      .dropdown-item {
-        color: #ffffffcc;
-        font-size: 0.95rem;
-        padding: 0.5rem 1.25rem;
+    }
 
-        &:hover {
-          background-color: #15406b;
-          color: #ffffff;
+    .navbar-toggler {
+      min-height: 60px;
+      padding: 0;
+      font-size: 16px;
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .space {
+        margin-left: 8px;
+      }
+      
+      .menu-text {
+        display: none;
+        font-size: 1rem;
+        font-weight: bold;
+        padding-left: 1rem;
+        
+        @media (max-width: 991px) {
+          display: inline-block;
         }
       }
     }
 
-
-    // Navbar principal
-    .navbar-lg {
-          padding: 0;
-          margin: 0;
-          background-color: #092039;
-      
-          .navbar-logo-container {
-              padding: 0;
-              margin: 0;
-              display: inline-block;
-          }
-                        // Estilos para los enlaces (links)
-          .text-underline {
-              text-decoration: underline !important;
-              text-underline-offset: 0.15em; // Reducido para acercarlo al texto
-              text-decoration-color: rgba(255, 255, 255, 0.7);
-              transition: all 0.3s ease;
-              &:hover {
-                  text-decoration: none !important;
-                  color: #ffffff; // Cambia el color al blanco, sin agregar brillo
-              }
-          }
-
-          .navbar-logo {
-              width: auto;
-              height: 80px;
-              max-width: 250px;
-              margin: 0 0 0 5rem;
-              padding: 0;
-              object-fit: contain;
-              display: block;
-          }
-
-          .navbar-toggler {
-              min-height: 70px;
-              padding: 0;
-              font-size: 16px;
-              border: none;
-              color: #fff;    
-              &:not(:disabled) {
-                cursor: pointer;
-              }
-          }
-
-          .navbar-collapse {
-              flex-grow: 0;
-          }
-
-          .navbar-nav {
-              margin-left: auto;
-          }
-
-          .nav-item {
-              margin-left: 1rem;
-              margin-right: 1rem;
-              display: flex;
-              align-items: center; // Para el align-middle
-          
-              .nav-link {
-                  @extend .body-link-small;
-                  @extend .text-underline;
-                  color: #fffffffb;
-                  position: relative;
-                  padding: 0.5rem 0;
-                  transition: text-shadow 0.3s ease; // Suavizar el cambio
-                  &:hover {
-                      font-size: 1rem;
-                      font-weight: bold;
-                      color: #FFFFFF;
-                  }
-              }
-              
-              .badge {
-                  position: absolute;
-                  top: -5px;
-                  right: -10px;
-                  padding: 0.25rem 0.5rem;
-                  border-radius: 50%;
-                  background-color: #dc3545;
-                  color: white;
-              }
-
-              i.bi-cart {
-                  font-size: 1.2rem;
-                  color: rgba(255, 255, 255, 0.8);
-                  transition: color 0.3s ease;
-                  &:hover {
-                    color: #fff;
-                  }
-              }
-
-          }
+    .navbar-logo {
+      margin-left: 1rem;
+      height: 60px;
     }
 
+    .nav-item-desktop {
+      display: none;
+    }
 
-    /* Estilos para tablets y mobiles */
-    @media (max-width: 991px) {
-
-      .navbar-lg {
-
-        /* Contenedor flexible para carrito y botón */
-        .mobile-controls {
-          display: flex;
-          align-items: center; // Centra verticalmente
-          gap: 12px; // Espacio entre carrito y botón (ajusta según necesites)
-          margin-left: auto; // Empuja el grupo a la derecha
-        }
-
-        .nav-item-desktop {
-          display: none;
-        }
-
-        .nav-item-mobile{
-          display: flex !important; // Fuerza visibilidad en móviles
-          align-items: center; // Centra el texto y las barras
-          margin: 0; // Elimina márgenes por defecto
-          padding: 0;
-          list-style: none; // Quita el bullet point de <li>
-          justify-content: center;
-          color: #fff;
-          min-height: 20px;
-          font-size: 16px;
-          border: none;
-        }
-
-        //Textos Menu/Cerrar y sus iconos
-        .navbar-toggler {
-          min-height: 60px;
-          padding: 0;
-          font-size: 16px;
-          border: none;
-          color: #fff;
-          display: flex;
-          align-items: center; // Centra el texto y las barras
-          justify-content: center;
-          .space {
-            margin-left: 8px; // Espacio entre el icono y el texto
-          }
-          .menu-text {
-            display: none; // Ocultar el texto por defecto
-            font-size: 1rem;
-            font-weight: bold;
-            padding-left: 1rem;
-            display: inline-block; // Muestra el texto en móviles
-          }
-        }
-
-        .navbar-logo {
-              margin-left: 1rem;
-              height: 60px;
-        }
-
-        .nav-item-desktop {
-              display: none;
-        }
-
-        // Cambios para la alineación a la izquierda de los nav-item en versión móvil (nav-items del menú)
-        .navbar-nav {
-              display: block; // Esto hace que los elementos se alineen verticalmente
-              padding: 0;
-              margin: 0;
-              width: 100%; // Asegura que ocupe todo el ancho disponible
-              
-            .nav-item {
-                margin-left: 0;  // Elimina el margen entre elementos
-                margin-right: 0;
-                display: block;  // Cambia de flex a block para que se alineen verticalmente
-                width: 100%;  // Esto asegura que cada item ocupe todo el ancho disponible
-                padding: 0.5rem 0;
-            }
-
-            .nav-link {
-                text-align: left;  // Alinea el texto a la izquierda
-                padding-left: 1rem; // Agrega algo de espacio a la izquierda si es necesario
-            }
-              
-            .app-clave-unica {
-                text-align: left;  // Alinea el texto a la izquierda
-                padding-left: 1rem; // Agrega algo de espacio a la izquierda si es necesario
-            }
-        }
+    // Alineación a la izquierda de los nav-item en versión móvil
+    .navbar-nav {
+      display: block;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      
+      .nav-item {
+        margin-left: 0;
+        margin-right: 0;
+        display: block;
+        width: 100%;
+        padding: 0.5rem 0;
       }
-    } 
 
+      .nav-link {
+        text-align: left;
+        padding-left: 1rem;
+      }
+        
+      .app-clave-unica {
+        text-align: left;
+        padding-left: 1rem;
+      }
+    }
+  }
+}
 
+// Estilos adicionales para mejorar la UX
+@media (max-width: 575px) {
+  .navbar-lg {
+    .navbar-logo {
+      margin-left: 0.5rem;
+      height: 50px;
+    }
+
+    .dropdown-menu-enhanced {
+      min-width: 260px;
+    }
+
+    .notification-dropdown {
+      min-width: 280px;
+      max-width: 90vw;
+    }
+  }
+}
+
+// Estados de focus para accesibilidad
+.nav-link:focus,
+.dropdown-item:focus,
+.navbar-toggler:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+// Mejoras para alto contraste
+@media (prefers-contrast: high) {
+  .navbar-lg {
+    border-bottom: 2px solid #fff;
+  }
+  
+  .dropdown-menu-dark .dropdown-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+// Mejoras para movimiento reducido
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .dropdown-item,
+  .navbar-toggler-icon-custom .line,
+  .dropdown-menu {
+    transition: none;
+    animation: none;
+  }
+}

@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <!-- Logo mejorado -->
     <a class="navbar-brand" routerLink="/">
-      <img src="assets/logo/logo_dicrep_recortado.png" alt="Logo DICREP" class="navbar-logo" />
+      <img src="assets/logo/logo_recortado.png" alt="Logo DICREP" class="navbar-logo" />
     </a>
 
     <!-- Contenedor fijo para controles móviles mejorado -->
@@ -142,29 +142,6 @@
                 </div>
               </a>
             </li>
-          </ul>
-        </li>
-
-        <!-- Dropdown de Ubicaciones MEJORADO -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-underline"
-             href="#"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false"
-             (click)="closeMenu()">
-            <i class="bi bi-geo-alt me-1"></i>Ubicaciones
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" routerLink="/regiones" (click)="closeMenu()">
-              <i class="bi bi-map me-2"></i>Regiones
-            </a></li>
-            <li><a class="dropdown-item" routerLink="/provincias" (click)="closeMenu()">
-              <i class="bi bi-signpost me-2"></i>Provincias
-            </a></li>
-            <li><a class="dropdown-item" routerLink="/comunas" (click)="closeMenu()">
-              <i class="bi bi-house me-2"></i>Comunas
-            </a></li>
           </ul>
         </li>
 
