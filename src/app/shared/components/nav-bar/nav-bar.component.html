@@ -1,4 +1,3 @@
-
 <nav class="navbar navbar-dark navbar-expand-lg navbar-lg">
   <div class="container-fluid">
     <!-- Logo -->
@@ -9,14 +8,14 @@
     <!-- Contenedor fijo para controles móviles -->
     <div class="d-flex align-items-center mobile-controls-container">
       <!-- Carrito móvil -->
-      <div class="nav-item-mobile position-relative me-2"> <!-- me-2 = margin-right pequeño -->
-        <a class="nav-link text-underline p-1" routerLink="/cart" (click)="closeMenu()"> <!-- p-1 = padding pequeño -->
+      <div class="nav-item-mobile position-relative me-2">
+        <a class="nav-link text-underline p-1" routerLink="/cart" (click)="closeMenu()">
           <i class="bi bi-cart align-middle"></i>
           <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{cartItemCount}}</span>
         </a>
       </div>
     
-        <!-- Botón de menú mobiles-->
+      <!-- Botón de menú móviles-->
       <button class="navbar-toggler p-2" type="button" (click)="toggleMenu()"
       data-bs-toggle="collapse"
       data-bs-target="#navbarContent"
@@ -27,16 +26,11 @@
       </button>
     </div>
 
-  
-    <!-- Contenido del navbar (rutas definidas en app.routes)-->
+    <!-- Contenido del navbar -->
     <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
-      <ul class="navbar-nav align-items-center"> <!-- Added align-items-center -->
-        <!-- Enlaces principales con subrayado -->
-        <li class="nav-item">
-          <a class="nav-link text-underline" routerLink="/condiciones" (click)="closeMenu()">Condiciones</a>
-        </li>
-
-                <!-- Dropdown de Ubicaciones -->
+      <ul class="navbar-nav align-items-center">
+        
+        <!-- Dropdown de Gestión de Bienes (NUEVO) -->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle text-underline"
@@ -46,17 +40,35 @@
             aria-expanded="false"
             (click)="closeMenu()"
           >
-            Ubicaciones
+            <i class="bi bi-gem me-1"></i>Gestión de Bienes
           </a>
           <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" routerLink="/regiones" (click)="closeMenu()">Regiones</a></li>
-            <li><a class="dropdown-item" routerLink="/provincias" (click)="closeMenu()">Provincias</a></li>
-            <li><a class="dropdown-item" routerLink="/comunas" (click)="closeMenu()">Comunas</a></li>
+            <li>
+              <a class="dropdown-item" routerLink="/extraccion-planilla" (click)="closeMenu()">
+                <i class="bi bi-download me-2"></i>Extraer Planilla Bienes
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/importacion-resultados" (click)="closeMenu()">
+                <i class="bi bi-upload me-2"></i>Importar Resultados
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" routerLink="/configuracion-incrementos" (click)="closeMenu()">
+                <i class="bi bi-gear me-2"></i>Config. Incrementos
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/datos-bancarios" (click)="closeMenu()">
+                <i class="bi bi-bank me-2"></i>Datos Bancarios
+              </a>
+            </li>
           </ul>
         </li>
 
 
-                        <!-- Dropdown de Prendas -->
+        <!-- Dropdown de Usuarios -->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle text-underline"
@@ -66,10 +78,9 @@
             aria-expanded="false"
             (click)="closeMenu()"
           >
-            Usuarios
+            <i class="bi bi-people me-1"></i>Usuarios
           </a>
           <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" routerLink="/clientes" (click)="closeMenu()">Clientes</a></li>
             <li><a class="dropdown-item" routerLink="/empleados" (click)="closeMenu()">Empleados</a></li>
           </ul>
         </li>
@@ -90,11 +101,9 @@
         <!-- Separador -->
         <li class="nav-separator"></li>
 
-
-      <!-- Versión desktop (en navbar-nav) -->
-      <li class="nav-item-desktop position-relative me-2">
-      </li>
-      
+        <!-- Versión desktop -->
+        <li class="nav-item-desktop position-relative me-2">
+        </li>
       
       </ul>
     </div>

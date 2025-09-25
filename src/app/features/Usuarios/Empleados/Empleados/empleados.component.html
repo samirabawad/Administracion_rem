@@ -1,186 +1,538 @@
 <div class="container">
-  <h2 class="mb-4 titulo-seccion">Mantenedor de Empleados</h2>
+  <h2 class="mb-4 titulo-seccion">
+    <i class="bi bi-people me-2"></i>Mantenedor de Empleados - Usuarios del Sistema
+  </h2>
 
-  <!-- Botón para abrir modal -->
-  <button class="btn btn-primario mb-3" (click)="abrirModal()">
-    <span class="icono">＋</span> Nuevo Empleado
+  <!-- Botón para nuevo empleado -->
+  <button class="btn btn-primary mb-3" (click)="abrirModal()">
+    <i class="bi bi-person-plus me-2"></i>Nuevo Empleado
   </button>
 
+  <!-- Modal para crear/editar empleado -->
   <div class="modal-backdrop" *ngIf="modalVisible"></div>
 
   <div class="modal-simple" *ngIf="modalVisible" role="dialog" aria-modal="true">
     <form #form="ngForm" (ngSubmit)="guardarEmpleado()" class="modal-content tarjeta tarjeta-elevada p-4">
       <div class="modal-header">
         <h5 class="modal-title encabezado-modal">
-          {{ modoEdicion ? 'Editar Empleado' : 'Crear Nuevo Empleado' }}
+          {{ modoEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}
         </h5>
         <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
       </div>
 
       <div class="modal-body">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Usuario</small>
-            <input [(ngModel)]="nuevoEmpleado.empUsuario" name="usuario" class="form-control" required />
-          </div>
+        <!-- Pestañas -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link" 
+                    [class.active]="pestanaActiva === 'datos'"
+                    (click)="pestanaActiva = 'datos'"
+                    type="button">
+              <i class="bi bi-person me-1"></i>Datos Personales
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" 
+                    [class.active]="pestanaActiva === 'acceso'"
+                    (click)="pestanaActiva = 'acceso'"
+                    type="button">
+              <i class="bi bi-key me-1"></i>Acceso al Sistema
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" 
+                    [class.active]="pestanaActiva === 'permisos'"
+                    (click)="pestanaActiva = 'permisos'"
+                    type="button">
+              <i class="bi bi-shield me-1"></i>Permisos
+            </button>
+          </li>
+        </ul>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">RUT</small>
-            <input [(ngModel)]="nuevoEmpleado.empRut" name="rut" type="number" class="form-control" required />
-          </div>
+        <!-- Pestaña: Datos Personales -->
+        <div *ngIf="pestanaActiva === 'datos'">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">RUT <span class="text-danger">*</span></label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empRut" 
+                     name="empRut" 
+                     class="form-control" 
+                     placeholder="12.345.678-9"
+                     pattern="[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]{1}"
+                     maxlength="12"
+                     required>
+              <div *ngIf="form.submitted && !nuevoEmpleado.empRut" class="text-danger mt-1 small">
+                El RUT es obligatorio.
+              </div>
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Dígito Verificador</small>
-            <input [(ngModel)]="nuevoEmpleado.empRutDig" name="dv" class="form-control" maxlength="1" required />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombres <span class="text-danger">*</span></label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empNombre" 
+                     name="empNombre" 
+                     class="form-control" 
+                     placeholder="Nombres del empleado"
+                     maxlength="50"
+                     required>
+              <div *ngIf="form.submitted && !nuevoEmpleado.empNombre" class="text-danger mt-1 small">
+                Los nombres son obligatorios.
+              </div>
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Nombre</small>
-            <input [(ngModel)]="nuevoEmpleado.empNombre" name="nombre" class="form-control" required />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Segundo Nombre</label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empSegundoNombre" 
+                     name="empSegundoNombre" 
+                     class="form-control" 
+                     placeholder="Segundo nombre (opcional)"
+                     maxlength="50">
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Segundo Nombre</small>
-            <input [(ngModel)]="nuevoEmpleado.empSegundoNombre" name="segundoNombre" class="form-control" />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Apellido Paterno <span class="text-danger">*</span></label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empApellido" 
+                     name="empApellido" 
+                     class="form-control" 
+                     placeholder="Apellido paterno"
+                     maxlength="50"
+                     required>
+              <div *ngIf="form.submitted && !nuevoEmpleado.empApellido" class="text-danger mt-1 small">
+                El apellido paterno es obligatorio.
+              </div>
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Apellido</small>
-            <input [(ngModel)]="nuevoEmpleado.empApellido" name="apellido" class="form-control" required />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Apellido Materno</label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empSegundoApellido" 
+                     name="empSegundoApellido" 
+                     class="form-control" 
+                     placeholder="Apellido materno"
+                     maxlength="50">
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Segundo Apellido</small>
-            <input [(ngModel)]="nuevoEmpleado.empSegundoApellido" name="segundoApellido" class="form-control" />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+              <input type="email" 
+                     [(ngModel)]="nuevoEmpleado.empCorreo" 
+                     name="empCorreo" 
+                     class="form-control" 
+                     placeholder="empleado@dicrep.cl"
+                     maxlength="100"
+                     required>
+              <div *ngIf="form.submitted && !nuevoEmpleado.empCorreo" class="text-danger mt-1 small">
+                El correo electrónico es obligatorio.
+              </div>
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Anexo</small>
-            <input [(ngModel)]="nuevoEmpleado.empAnexo" name="anexo" class="form-control" />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Teléfono</label>
+              <input type="tel" 
+                     [(ngModel)]="nuevoEmpleado.empTelefono" 
+                     name="empTelefono" 
+                     class="form-control" 
+                     placeholder="+56 9 1234 5678"
+                     maxlength="15">
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Correo</small>
-            <input [(ngModel)]="nuevoEmpleado.empCorreo" name="correo" type="email" class="form-control" required />
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Anexo</label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empAnexo" 
+                     name="empAnexo" 
+                     class="form-control" 
+                     placeholder="Ej: 101"
+                     maxlength="10">
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Perfil</small>
-            <select [(ngModel)]="nuevoEmpleado.perfilId" name="perfilId" class="form-select" required>
-              <option [ngValue]="null" disabled selected>Seleccione perfil</option>
-              <option *ngFor="let perfil of perfiles" [ngValue]="perfil.perfilId">{{ perfil.perfilNombre }}</option>
-            </select>
-          </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Cargo</label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empCargo" 
+                     name="empCargo" 
+                     class="form-control" 
+                     placeholder="Ej: Analista de Sistemas"
+                     maxlength="100">
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Sucursal</small>
-            <select [(ngModel)]="nuevoEmpleado.sucursalId" name="sucursalId" class="form-select" required>
-              <option [ngValue]="null" disabled selected>Seleccione sucursal</option>
-              <option *ngFor="let sucursal of sucursales" [ngValue]="sucursal.sucursalId">
-                {{ sucursal.sucursalNombre }}
-              </option>
-            </select>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Sucursal <span class="text-danger">*</span></label>
+              <select [(ngModel)]="nuevoEmpleado.sucursalId" name="sucursalId" class="form-select" required>
+                <option [ngValue]="null" disabled selected>Seleccione sucursal</option>
+                <option *ngFor="let sucursal of sucursales" [ngValue]="sucursal.sucursalId">
+                  {{sucursal.sucursalNombre}} - {{sucursal.sucursalCiudad}}
+                </option>
+              </select>
+              <div *ngIf="form.submitted && !nuevoEmpleado.sucursalId" class="text-danger mt-1 small">
+                La sucursal es obligatoria.
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Método de Autenticación</small>
-            <select [(ngModel)]="nuevoEmpleado.authMethod" name="authMethod" class="form-select" required>
-              <option [ngValue]="0">Contraseña</option>
-              <option [ngValue]="1">LDAP</option>
-            </select>
+        <!-- Pestaña: Acceso al Sistema -->
+        <div *ngIf="pestanaActiva === 'acceso'">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Usuario <span class="text-danger">*</span></label>
+              <input type="text" 
+                     [(ngModel)]="nuevoEmpleado.empUsuario" 
+                     name="empUsuario" 
+                     class="form-control" 
+                     placeholder="Nombre de usuario"
+                     pattern="[a-zA-Z0-9._-]+"
+                     maxlength="30"
+                     required>
+              <small class="form-text text-muted">Solo letras, números, puntos, guiones y guión bajo</small>
+              <div *ngIf="form.submitted && !nuevoEmpleado.empUsuario" class="text-danger mt-1 small">
+                El nombre de usuario es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Método de Autenticación</label>
+              <select [(ngModel)]="nuevoEmpleado.authMethod" name="authMethod" class="form-select" required>
+                <option [ngValue]="0">Contraseña Local</option>
+                <option [ngValue]="1">LDAP/Active Directory</option>
+                <option [ngValue]="2">Clave Única</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3" *ngIf="nuevoEmpleado.authMethod === 0">
+              <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input [type]="mostrarPassword ? 'text' : 'password'" 
+                       [(ngModel)]="nuevoEmpleado.password" 
+                       name="password" 
+                       class="form-control" 
+                       placeholder="Contraseña segura"
+                       minlength="8"
+                       [required]="nuevoEmpleado.authMethod === 0">
+                <button class="btn btn-outline-secondary" 
+                        type="button" 
+                        (click)="mostrarPassword = !mostrarPassword">
+                  <i class="bi" [class.bi-eye]="!mostrarPassword" [class.bi-eye-slash]="mostrarPassword"></i>
+                </button>
+              </div>
+              <small class="form-text text-muted">Mínimo 8 caracteres</small>
+              <div *ngIf="form.submitted && nuevoEmpleado.authMethod === 0 && !nuevoEmpleado.password" class="text-danger mt-1 small">
+                La contraseña es obligatoria para autenticación local.
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3" *ngIf="nuevoEmpleado.authMethod === 0">
+              <label class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+              <input type="password" 
+                     [(ngModel)]="confirmarPassword" 
+                     name="confirmarPassword" 
+                     class="form-control" 
+                     placeholder="Repita la contraseña"
+                     [required]="nuevoEmpleado.authMethod === 0">
+              <div *ngIf="form.submitted && nuevoEmpleado.authMethod === 0 && confirmarPassword !== nuevoEmpleado.password" class="text-danger mt-1 small">
+                Las contraseñas no coinciden.
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Estado de la Cuenta</label>
+              <select [(ngModel)]="nuevoEmpleado.empActivo" name="empActivo" class="form-select" required>
+                <option [ngValue]="true">Activo</option>
+                <option [ngValue]="false">Inactivo</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Fecha de Expiración</label>
+              <input type="date" 
+                     [(ngModel)]="fechaExpiracionStr" 
+                     name="fechaExpiracion" 
+                     class="form-control">
+              <small class="form-text text-muted">Opcional. Deje vacío para sin expiración</small>
+            </div>
+
+            <div class="col-12 mb-3">
+              <div class="form-check">
+                <input type="checkbox" 
+                       [(ngModel)]="nuevoEmpleado.forzarCambioPassword" 
+                       name="forzarCambioPassword" 
+                       class="form-check-input" 
+                       id="forzarCambioPassword">
+                <label class="form-check-label" for="forzarCambioPassword">
+                  Forzar cambio de contraseña en el próximo inicio de sesión
+                </label>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Contraseña</small>
-            <input [(ngModel)]="nuevoEmpleado.password" name="password" type="password" class="form-control" required />
-          </div>
+        <!-- Pestaña: Permisos -->
+        <div *ngIf="pestanaActiva === 'permisos'">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Perfil de Usuario <span class="text-danger">*</span></label>
+              <select [(ngModel)]="nuevoEmpleado.perfilId" name="perfilId" class="form-select" required>
+                <option [ngValue]="null" disabled selected>Seleccione perfil</option>
+                <option *ngFor="let perfil of perfiles" [ngValue]="perfil.perfilId">
+                  {{perfil.perfilNombre}} - {{perfil.perfilDescripcion}}
+                </option>
+              </select>
+              <div *ngIf="form.submitted && !nuevoEmpleado.perfilId" class="text-danger mt-1 small">
+                El perfil es obligatorio.
+              </div>
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <small class="form-text text-muted d-block mb-1">Estado</small>
-            <select [(ngModel)]="nuevoEmpleado.empActivo" name="activo" class="form-select" required>
-              <option [ngValue]="true">Activo</option>
-              <option [ngValue]="false">Inactivo</option>
-            </select>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nivel de Acceso</label>
+              <select [(ngModel)]="nuevoEmpleado.nivelAcceso" name="nivelAcceso" class="form-select">
+                <option value="1">Nivel 1 - Operador</option>
+                <option value="2">Nivel 2 - Supervisor</option>
+                <option value="3">Nivel 3 - Administrador</option>
+                <option value="4">Nivel 4 - Super Admin</option>
+              </select>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label class="form-label">Permisos Específicos</label>
+              <div class="permissions-grid">
+                <div class="form-check" *ngFor="let permiso of permisosDisponibles">
+                  <input type="checkbox" 
+                         [(ngModel)]="permiso.asignado" 
+                         name="permiso_{{permiso.permisoId}}" 
+                         class="form-check-input" 
+                         [id]="'permiso_' + permiso.permisoId">
+                  <label class="form-check-label" [for]="'permiso_' + permiso.permisoId">
+                    <strong>{{permiso.permisoNombre}}</strong>
+                    <small class="d-block text-muted">{{permiso.permisoDescripcion}}</small>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 mb-3">
+              <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Perfil seleccionado:</strong> 
+                <span *ngIf="perfilSeleccionado">{{perfilSeleccionado.perfilNombre}} - {{perfilSeleccionado.perfilDescripcion}}</span>
+                <span *ngIf="!perfilSeleccionado">Ninguno</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="modal-footer justify-content-end">
-        <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
-        <button type="submit" class="btn btn-primary">
-          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
-        </button>
+      <div class="modal-footer justify-content-between">
+        <div>
+          <button type="button" class="btn btn-outline-info" (click)="generarUsuarioAutomatico()" *ngIf="!modoEdicion">
+            <i class="bi bi-magic me-1"></i>Generar Usuario
+          </button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando">
+            <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!guardando" class="bi bi-check-circle me-1"></i>
+            {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Crear Empleado') }}
+          </button>
+        </div>
       </div>
     </form>
   </div>
 
-  <!-- Filtros -->
-  <div class="row mb-3">
-    <div class="col-md-6">
-      <input [(ngModel)]="filtroNombre" type="text" class="form-control" placeholder="Filtrar por nombre o usuario" />
+  <!-- Filtros y búsqueda -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros y Búsqueda</h5>
     </div>
-    <div class="col-md-6">
-      <select class="form-select" [(ngModel)]="filtroEstado">
-        <option value="todos">Todos los estados</option>
-        <option value="activos">Activos</option>
-        <option value="inactivos">Inactivos</option>
-      </select>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Buscar empleado</label>
+          <input type="text" 
+                 [(ngModel)]="filtros.busqueda" 
+                 class="form-control" 
+                 placeholder="Nombre, RUT, usuario o correo"
+                 (input)="aplicarFiltros()">
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Estado</label>
+          <select [(ngModel)]="filtros.estado" class="form-select" (change)="aplicarFiltros()">
+            <option value="todos">Todos</option>
+            <option value="activos">Activos</option>
+            <option value="inactivos">Inactivos</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Perfil</label>
+          <select [(ngModel)]="filtros.perfil" class="form-select" (change)="aplicarFiltros()">
+            <option value="">Todos los perfiles</option>
+            <option *ngFor="let perfil of perfiles" [value]="perfil.perfilId">{{perfil.perfilNombre}}</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Sucursal</label>
+          <select [(ngModel)]="filtros.sucursal" class="form-select" (change)="aplicarFiltros()">
+            <option value="">Todas las sucursales</option>
+            <option *ngFor="let sucursal of sucursales" [value]="sucursal.sucursalId">{{sucursal.sucursalNombre}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 text-end">
+          <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+            <i class="bi bi-x-circle me-1"></i>Limpiar Filtros
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tabla de Empleados -->
+  <!-- Estadísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">{{empleadosFiltrados.length}}</h5>
+          <p class="card-text">Total Empleados</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success">{{contarPorEstado('activos')}}</h5>
+          <p class="card-text">Activos</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-danger">
+        <div class="card-body">
+          <h5 class="card-title text-danger">{{contarPorEstado('inactivos')}}</h5>
+          <p class="card-text">Inactivos</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-warning">
+        <div class="card-body">
+          <h5 class="card-title text-warning">{{contarProximosVencer()}}</h5>
+          <p class="card-text">Próximos a Vencer</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de empleados -->
   <div class="tabla-contenedor">
     <table class="table tabla-estandar">
       <thead>
         <tr>
-          <th style="width: 40px;"><input type="checkbox" (change)="toggleSeleccionarTodo($event)" /></th>
+          <th style="width: 40px;">
+            <input type="checkbox" (change)="toggleSeleccionarTodos($event)" [checked]="todoSeleccionado()">
+          </th>
           <th>Usuario</th>
-          <th>Nombre</th>
+          <th>Empleado</th>
+          <th>RUT</th>
           <th>Correo</th>
           <th>Perfil</th>
           <th>Sucursal</th>
           <th>Estado</th>
+          <th>Último Acceso</th>
           <th style="width: 150px;" class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let empleado of empleadosFiltrados">
-          <td><input type="checkbox" [(ngModel)]="empleado.seleccionada" /></td>
-          <td>{{ empleado.empUsuario }}</td>
-          <td>{{ empleado.empNombre }} {{ empleado.empApellido }}</td>
-          <td>{{ empleado.empCorreo }}</td>
-          <td>{{ obtenerNombrePerfil(empleado.perfilId) }}</td>
-          <td>{{ obtenerNombreSucursal(empleado.sucursalId) }}</td>
+        <tr *ngFor="let empleado of empleadosFiltrados" 
+            [class.table-success]="empleado.empActivo"
+            [class.table-secondary]="!empleado.empActivo">
           <td>
-            <span [ngClass]="empleado.empActivo ? 'text-success' : 'text-danger'">
-              {{ empleado.empActivo ? 'Activo' : 'Inactivo' }}
+            <input type="checkbox" [(ngModel)]="empleado.seleccionado" name="chk_{{empleado.empId}}">
+          </td>
+          <td>
+            <div class="usuario-info">
+              <strong>{{empleado.empUsuario}}</strong>
+              <small class="d-block text-muted" *ngIf="empleado.authMethod !== undefined">
+                {{obtenerTipoAuth(empleado.authMethod)}}
+              </small>
+            </div>
+          </td>
+          <td>
+            <div class="empleado-info">
+              <strong>{{empleado.empNombre}} {{empleado.empApellido}}</strong>
+              <small class="d-block text-muted" *ngIf="empleado.empCargo">{{empleado.empCargo}}</small>
+            </div>
+          </td>
+          <td>
+            <code>{{empleado.empRut}}</code>
+          </td>
+          <td>
+            <small>{{empleado.empCorreo}}</small>
+            <small class="d-block text-muted" *ngIf="empleado.empTelefono">{{empleado.empTelefono}}</small>
+          </td>
+          <td>
+            <span class="badge bg-info" *ngIf="empleado.perfilNombre">{{empleado.perfilNombre}}</span>
+            <span class="text-muted" *ngIf="!empleado.perfilNombre">Sin perfil</span>
+          </td>
+          <td>
+            <span *ngIf="empleado.sucursalNombre">{{empleado.sucursalNombre}}</span>
+            <span class="text-muted" *ngIf="!empleado.sucursalNombre">Sin sucursal</span>
+          </td>
+          <td>
+            <span class="badge"
+                  [class.bg-success]="empleado.empActivo"
+                  [class.bg-danger]="!empleado.empActivo">
+              {{empleado.empActivo ? 'Activo' : 'Inactivo'}}
             </span>
+            <small class="d-block text-muted" *ngIf="empleado.empFechaExp && estaProximoVencer(empleado.empFechaExp)">
+              <i class="bi bi-exclamation-triangle text-warning"></i> Expira pronto
+            </small>
+          </td>
+          <td>
+            <small *ngIf="empleado.empFechaLog">
+              {{empleado.empFechaLog | date:'dd/MM/yyyy HH:mm'}}
+            </small>
+            <span *ngIf="!empleado.empFechaLog" class="text-muted">Nunca</span>
           </td>
           <td class="text-center">
-            <button class="btn btn-sm btn-icono btn-info me-2" title="Ver" disabled>
-              <i class="bi bi-eye-fill"></i>
+            <button class="btn btn-sm btn-outline-primary me-1" 
+                    title="Editar empleado"
+                    (click)="editarEmpleado(empleado)">
+              <i class="bi bi-pencil"></i>
             </button>
-            <button class="btn btn-sm btn-icono btn-warning me-2" title="Editar" (click)="editarEmpleado(empleado)">
-              <i class="bi bi-pencil-fill"></i>
+            <button class="btn btn-sm" 
+                    [class.btn-outline-warning]="empleado.empActivo"
+                    [class.btn-outline-success]="!empleado.empActivo"
+                    [title]="empleado.empActivo ? 'Desactivar' : 'Activar'"
+                    (click)="toggleEstadoEmpleado(empleado)">
+              <i class="bi" [class.bi-pause]="empleado.empActivo" [class.bi-play]="!empleado.empActivo"></i>
             </button>
-            <button class="btn btn-sm btn-icono btn-danger" title="Eliminar" (click)="eliminarEmpleado(empleado.empId)">
-              <i class="bi bi-trash-fill"></i>
+            <button class="btn btn-sm btn-outline-info ms-1" 
+                    title="Ver historial"
+                    (click)="verHistorial(empleado)">
+              <i class="bi bi-clock-history"></i>
             </button>
           </td>
         </tr>
       </tbody>
     </table>
 
+    <!-- Mensaje si no hay datos -->
+    <div *ngIf="empleadosFiltrados.length === 0" class="text-center py-4">
+      <i class="bi bi-people display-4 text-muted"></i>
+      <p class="mt-2 text-muted">No se encontraron empleados con los filtros aplicados</p>
+      <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Ver todos los empleados
+      </button>
+    </div>
+
     <!-- Paginación -->
-    <div class="paginacion d-flex justify-content-between align-items-center mt-3">
+    <div class="paginacion d-flex justify-content-between align-items-center mt-3" *ngIf="empleadosFiltrados.length > 0">
       <div>
-        Mostrar
-        <select class="form-select d-inline-block w-auto ms-1 me-1">
-          <option>5</option>
-          <option>10</option>
-          <option>25</option>
-        </select>
-        registros
+        Mostrando {{empleadosFiltrados.length}} de {{empleados.length}} empleados
       </div>
       <nav>
         <ul class="pagination mb-0">
@@ -189,6 +541,34 @@
           <li class="page-item"><a class="page-link" href="#">3</a></li>
         </ul>
       </nav>
+    </div>
+  </div>
+
+  <!-- Acciones masivas -->
+  <div class="card mt-4" *ngIf="haySeleccionados()">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-check me-2"></i>Acciones Masivas ({{contarSeleccionados()}} seleccionados)
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-success" (click)="activarSeleccionados()">
+          <i class="bi bi-play me-1"></i>Activar
+        </button>
+        <button class="btn btn-outline-warning" (click)="desactivarSeleccionados()">
+          <i class="bi bi-pause me-1"></i>Desactivar
+        </button>
+        <button class="btn btn-outline-primary" (click)="exportarSeleccionados()">
+          <i class="bi bi-download me-1"></i>Exportar
+        </button>
+        <button class="btn btn-outline-info" (click)="enviarCredenciales()">
+          <i class="bi bi-envelope me-1"></i>Enviar Credenciales
+        </button>
+        <button class="btn btn-outline-secondary" (click)="resetearPasswords()">
+          <i class="bi bi-key me-1"></i>Resetear Contraseñas
+        </button>
+      </div>
     </div>
   </div>
 </div>

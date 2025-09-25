@@ -1,0 +1,409 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">
+    <i class="bi bi-bank me-2"></i>Actualización de Datos Bancarios de Comitentes
+  </h2>
+
+  <!-- Filtros de búsqueda -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-search me-2"></i>Búsqueda de Comitentes</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Buscar por nombre o RUT</label>
+          <input type="text" 
+                 [(ngModel)]="filtros.busqueda" 
+                 class="form-control" 
+                 placeholder="Ingrese nombre o RUT del comitente"
+                 (input)="aplicarFiltros()">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Estado de datos bancarios</label>
+          <select [(ngModel)]="filtros.estadoBanco" class="form-select" (change)="aplicarFiltros()">
+            <option value="todos">Todos</option>
+            <option value="completos">Datos completos</option>
+            <option value="incompletos">Datos incompletos</option>
+            <option value="sin-datos">Sin datos bancarios</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Banco</label>
+          <select [(ngModel)]="filtros.banco" class="form-select" (change)="aplicarFiltros()">
+            <option value="">Todos los bancos</option>
+            <option *ngFor="let banco of bancos" [value]="banco.codigo">{{banco.nombre}}</option>
+          </select>
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label">&nbsp;</label>
+          <div class="d-grid">
+            <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+              <i class="bi bi-x-circle me-1"></i>Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumen estadísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">{{comitestesFiltrados.length}}</h5>
+          <p class="card-text">Total Comitentes</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success">{{contarPorEstado('completos')}}</h5>
+          <p class="card-text">Datos Completos</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-warning">
+        <div class="card-body">
+          <h5 class="card-title text-warning">{{contarPorEstado('incompletos')}}</h5>
+          <p class="card-text">Datos Incompletos</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-danger">
+        <div class="card-body">
+          <h5 class="card-title text-danger">{{contarPorEstado('sin-datos')}}</h5>
+          <p class="card-text">Sin Datos Bancarios</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para editar datos bancarios -->
+  <div class="modal-backdrop" *ngIf="modalVisible"></div>
+
+  <div class="modal-simple" *ngIf="modalVisible" role="dialog" aria-modal="true">
+    <form #form="ngForm" (ngSubmit)="guardarDatosBancarios()" class="modal-content tarjeta tarjeta-elevada p-4">
+      <div class="modal-header">
+        <h5 class="modal-title encabezado-modal">
+          Datos Bancarios - {{comitenteSeleccionado?.comitenteNombre}}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Información del comitente -->
+        <div class="alert alert-info mb-3" *ngIf="comitenteSeleccionado">
+          <div class="row">
+            <div class="col-md-6">
+              <strong>RUT:</strong> {{comitenteSeleccionado.comitenteRut}}
+            </div>
+            <div class="col-md-6">
+              <strong>Email:</strong> {{comitenteSeleccionado.comitenteCorreo}}
+            </div>
+            <div class="col-md-6">
+              <strong>Teléfono:</strong> {{comitenteSeleccionado.comitenteTelefono}}
+            </div>
+            <div class="col-md-6">
+              <strong>Bienes activos:</strong> 
+              <span class="badge bg-primary">{{contarBienesActivos(comitenteSeleccionado.comitenteId)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Banco <span class="text-danger">*</span></label>
+            <select [(ngModel)]="datosBancarios.bancoCodigo" 
+                    name="bancoCodigo" 
+                    class="form-select" 
+                    required
+                    (change)="onBancoChange()">
+              <option value="">Seleccione un banco</option>
+              <option *ngFor="let banco of bancos" [value]="banco.codigo">
+                {{banco.nombre}}
+              </option>
+            </select>
+            <div *ngIf="form.submitted && !datosBancarios.bancoCodigo" class="text-danger mt-1 small">
+              El banco es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Tipo de Cuenta <span class="text-danger">*</span></label>
+            <select [(ngModel)]="datosBancarios.cuentaTipo" name="cuentaTipo" class="form-select" required>
+              <option value="">Seleccione tipo</option>
+              <option value="Corriente">Cuenta Corriente</option>
+              <option value="Vista">Cuenta Vista</option>
+              <option value="Ahorro">Cuenta de Ahorro</option>
+            </select>
+            <div *ngIf="form.submitted && !datosBancarios.cuentaTipo" class="text-danger mt-1 small">
+              El tipo de cuenta es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Número de Cuenta <span class="text-danger">*</span></label>
+            <input type="text" 
+                   [(ngModel)]="datosBancarios.cuentaNumero" 
+                   name="cuentaNumero" 
+                   class="form-control" 
+                   placeholder="Ingrese el número de cuenta"
+                   pattern="[0-9-]+"
+                   maxlength="20"
+                   required>
+            <small class="form-text text-muted">Solo números y guiones. Ejemplo: 12345678-9</small>
+            <div *ngIf="form.submitted && !datosBancarios.cuentaNumero" class="text-danger mt-1 small">
+              El número de cuenta es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-md-8 mb-3">
+            <label class="form-label">Nombre del Titular <span class="text-danger">*</span></label>
+            <input type="text" 
+                   [(ngModel)]="datosBancarios.cuentaTitular" 
+                   name="cuentaTitular" 
+                   class="form-control" 
+                   placeholder="Nombre completo del titular"
+                   maxlength="100"
+                   required>
+            <div *ngIf="form.submitted && !datosBancarios.cuentaTitular" class="text-danger mt-1 small">
+              El nombre del titular es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">RUT del Titular <span class="text-danger">*</span></label>
+            <input type="text" 
+                   [(ngModel)]="datosBancarios.cuentaRutTitular" 
+                   name="cuentaRutTitular" 
+                   class="form-control" 
+                   placeholder="12.345.678-9"
+                   pattern="[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]{1}"
+                   maxlength="12"
+                   required>
+            <div *ngIf="form.submitted && !datosBancarios.cuentaRutTitular" class="text-danger mt-1 small">
+              El RUT del titular es obligatorio.
+            </div>
+          </div>
+
+          <!-- Validación de datos -->
+          <div class="col-12 mb-3">
+            <div class="form-check">
+              <input type="checkbox" 
+                     [(ngModel)]="validacionDatos.datosVerificados" 
+                     name="datosVerificados" 
+                     class="form-check-input" 
+                     id="datosVerificados"
+                     required>
+              <label class="form-check-label" for="datosVerificados">
+                Confirmo que los datos bancarios han sido verificados con el comitente
+              </label>
+            </div>
+            <div *ngIf="form.submitted && !validacionDatos.datosVerificados" class="text-danger mt-1 small">
+              Debe confirmar la verificación de los datos.
+            </div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label">Observaciones</label>
+            <textarea [(ngModel)]="validacionDatos.observaciones" 
+                      name="observaciones" 
+                      class="form-control" 
+                      rows="3"
+                      placeholder="Observaciones adicionales (opcional)"
+                      maxlength="500"></textarea>
+            <small class="form-text text-muted">{{validacionDatos.observaciones?.length || 0}}/500 caracteres</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando">
+          <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!guardando" class="bi bi-check-circle me-1"></i>
+          {{guardando ? 'Guardando...' : 'Guardar Datos'}}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de comitentes -->
+  <div class="tabla-contenedor">
+    <table class="table tabla-estandar">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" (change)="toggleSeleccionarTodos($event)" [checked]="todoSeleccionado()">
+          </th>
+          <th>Comitente</th>
+          <th>RUT</th>
+          <th>Contacto</th>
+          <th>Banco</th>
+          <th>Cuenta</th>
+          <th>Estado Datos</th>
+          <th>Bienes Activos</th>
+          <th>Última Actualización</th>
+          <th style="width: 120px;" class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let comitente of comitestesFiltrados" 
+            [class.table-success]="obtenerEstadoDatos(comitente) === 'completos'"
+            [class.table-warning]="obtenerEstadoDatos(comitente) === 'incompletos'"
+            [class.table-danger]="obtenerEstadoDatos(comitente) === 'sin-datos'">
+          <td>
+            <input type="checkbox" [(ngModel)]="comitente.seleccionado" name="chk_{{comitente.comitenteId}}">
+          </td>
+          <td>
+            <div class="comitente-info">
+              <strong>{{comitente.comitenteNombre}}</strong>
+            </div>
+          </td>
+          <td>
+            <code>{{comitente.comitenteRut}}</code>
+          </td>
+          <td>
+            <small class="d-block">{{comitente.comitenteCorreo}}</small>
+            <small class="text-muted">{{comitente.comitenteTelefono}}</small>
+          </td>
+          <td>
+            <div *ngIf="comitente.bancoNombre" class="banco-info">
+              <strong>{{comitente.bancoNombre}}</strong>
+            </div>
+            <span *ngIf="!comitente.bancoNombre" class="text-muted">-</span>
+          </td>
+          <td>
+            <div *ngIf="comitente.cuentaNumero" class="cuenta-info">
+              <div><strong>{{comitente.cuentaNumero}}</strong></div>
+              <small class="text-muted">{{comitente.cuentaTipo}}</small>
+            </div>
+            <span *ngIf="!comitente.cuentaNumero" class="text-muted">-</span>
+          </td>
+          <td>
+            <span class="badge"
+                  [class.bg-success]="obtenerEstadoDatos(comitente) === 'completos'"
+                  [class.bg-warning]="obtenerEstadoDatos(comitente) === 'incompletos'"
+                  [class.bg-danger]="obtenerEstadoDatos(comitente) === 'sin-datos'">
+              {{obtenerTextoEstado(comitente)}}
+            </span>
+          </td>
+          <td class="text-center">
+            <span class="badge bg-info">{{contarBienesActivos(comitente.comitenteId)}}</span>
+          </td>
+          <td>
+            <small *ngIf="comitente.fechaUltimaActualizacion">
+              {{comitente.fechaUltimaActualizacion | date:'dd/MM/yyyy HH:mm'}}
+            </small>
+            <span *ngIf="!comitente.fechaUltimaActualizacion" class="text-muted">Nunca</span>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-1" 
+                    title="Editar datos bancarios"
+                    (click)="editarDatosBancarios(comitente)">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-info" 
+                    title="Ver historial"
+                    (click)="verHistorial(comitente)">
+              <i class="bi bi-clock-history"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Mensaje si no hay datos -->
+    <div *ngIf="comitestesFiltrados.length === 0" class="text-center py-4">
+      <i class="bi bi-people display-4 text-muted"></i>
+      <p class="mt-2 text-muted">No se encontraron comitentes con los filtros aplicados</p>
+      <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Ver todos los comitentes
+      </button>
+    </div>
+
+    <!-- Paginación -->
+    <div class="paginacion d-flex justify-content-between align-items-center mt-3" *ngIf="comitestesFiltrados.length > 0">
+      <div>
+        Mostrando {{comitestesFiltrados.length}} de {{comitentes.length}} comitentes
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Acciones masivas -->
+  <div class="card mt-4" *ngIf="haySeleccionados()">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-check me-2"></i>Acciones Masivas ({{contarSeleccionados()}} seleccionados)
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary" (click)="exportarSeleccionados()">
+          <i class="bi bi-download me-1"></i>Exportar Datos Bancarios
+        </button>
+        <button class="btn btn-outline-warning" (click)="enviarRecordatorios()">
+          <i class="bi bi-envelope me-1"></i>Enviar Recordatorios
+        </button>
+        <button class="btn btn-outline-info" (click)="generarReporte()">
+          <i class="bi bi-file-earmark-text me-1"></i>Generar Reporte
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial reciente -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-clock-history me-2"></i>Actualizaciones Recientes
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Comitente</th>
+              <th>Usuario</th>
+              <th>Acción</th>
+              <th>Detalles</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let actualizacion of historialReciente">
+              <td>
+                <small>{{actualizacion.fecha | date:'dd/MM/yyyy HH:mm'}}</small>
+              </td>
+              <td>{{actualizacion.comitenteNombre}}</td>
+              <td>{{actualizacion.usuario}}</td>
+              <td>
+                <span class="badge"
+                      [class.bg-success]="actualizacion.accion === 'Actualizar'"
+                      [class.bg-primary]="actualizacion.accion === 'Crear'"
+                      [class.bg-warning]="actualizacion.accion === 'Verificar'">
+                  {{actualizacion.accion}}
+                </span>
+              </td>
+              <td>
+                <small class="text-muted">{{actualizacion.detalles}}</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

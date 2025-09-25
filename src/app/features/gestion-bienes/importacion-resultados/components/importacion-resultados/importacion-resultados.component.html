@@ -1,0 +1,276 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">
+    <i class="bi bi-upload me-2"></i>Importación de Resultados de Subastas
+  </h2>
+
+  <!-- Zona de carga de archivo -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-file-earmark-excel me-2"></i>Cargar Archivo de Resultados</h5>
+    </div>
+    <div class="card-body">
+      <!-- Área de drag & drop -->
+      <div class="upload-zone" 
+           [class.dragover]="isDragOver"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave($event)"
+           (drop)="onDrop($event)"
+           (click)="triggerFileInput()">
+        <div class="upload-content text-center">
+          <i class="bi bi-cloud-upload display-4 text-muted mb-3"></i>
+          <h5>Arrastra tu archivo aquí o haz clic para seleccionar</h5>
+          <p class="text-muted">Archivos permitidos: .xlsx, .xls (Máximo 10MB)</p>
+          <button type="button" class="btn btn-outline-primary">
+            <i class="bi bi-folder2-open me-2"></i>Seleccionar Archivo
+          </button>
+        </div>
+      </div>
+      
+      <!-- Input file oculto -->
+      <input type="file" 
+             #fileInput 
+             (change)="onFileSelected($event)"
+             accept=".xlsx,.xls"
+             style="display: none;">
+
+      <!-- Información del archivo seleccionado -->
+      <div *ngIf="archivoSeleccionado" class="mt-3">
+        <div class="alert alert-info d-flex align-items-center">
+          <i class="bi bi-file-earmark-check me-2"></i>
+          <div class="flex-grow-1">
+            <strong>{{archivoSeleccionado.name}}</strong>
+            <small class="d-block">{{(archivoSeleccionado.size / 1024 / 1024) | number:'1.1-1'}} MB</small>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" (click)="removerArchivo()">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="d-flex justify-content-between mt-3">
+        <div>
+          <button class="btn btn-info me-2" (click)="descargarPlantilla()">
+            <i class="bi bi-download me-1"></i>Descargar Plantilla
+          </button>
+          <button class="btn btn-outline-secondary" (click)="verEjemplo()">
+            <i class="bi bi-eye me-1"></i>Ver Ejemplo
+          </button>
+        </div>
+        <div>
+          <button class="btn btn-success" 
+                  [disabled]="!archivoSeleccionado || procesando"
+                  (click)="procesarArchivo()">
+            <span *ngIf="procesando" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!procesando" class="bi bi-check-circle me-1"></i>
+            {{procesando ? 'Procesando...' : 'Procesar Archivo'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progreso de procesamiento -->
+  <div *ngIf="progreso.mostrar" class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-gear me-2"></i>Procesando Archivo
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="progress mb-2">
+        <div class="progress-bar" 
+             [style.width.%]="progreso.porcentaje"
+             [class.bg-success]="progreso.porcentaje === 100"
+             [class.bg-warning]="progreso.porcentaje < 100 && progreso.porcentaje > 0">
+          {{progreso.porcentaje}}%
+        </div>
+      </div>
+      <p class="mb-0">
+        <i class="bi bi-info-circle me-1"></i>
+        {{progreso.mensaje}}
+      </p>
+    </div>
+  </div>
+
+  <!-- Validaciones y errores -->
+  <div *ngIf="validaciones.length > 0" class="card mb-4 border-warning">
+    <div class="card-header bg-warning bg-opacity-10">
+      <h5 class="mb-0 text-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>Validaciones y Advertencias
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Fila</th>
+              <th>Tipo</th>
+              <th>Campo</th>
+              <th>Mensaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let validacion of validaciones" 
+                [class.table-danger]="validacion.tipo === 'error'"
+                [class.table-warning]="validacion.tipo === 'advertencia'">
+              <td>{{validacion.fila}}</td>
+              <td>
+                <span class="badge" 
+                      [class.bg-danger]="validacion.tipo === 'error'"
+                      [class.bg-warning]="validacion.tipo === 'advertencia'">
+                  {{validacion.tipo === 'error' ? 'Error' : 'Advertencia'}}
+                </span>
+              </td>
+              <td><code>{{validacion.campo}}</code></td>
+              <td>{{validacion.mensaje}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview de datos procesados -->
+  <div *ngIf="datosPreview.length > 0" class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="bi bi-table me-2"></i>Preview de Datos ({{datosPreview.length}} registros)
+      </h5>
+      <div>
+        <button class="btn btn-sm btn-outline-primary me-2" (click)="exportarErrores()" 
+                *ngIf="tieneErrores()">
+          <i class="bi bi-file-earmark-excel me-1"></i>Exportar Errores
+        </button>
+        <button class="btn btn-sm btn-success" 
+                [disabled]="tieneErrores() || guardando"
+                (click)="confirmarImportacion()">
+          <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!guardando" class="bi bi-check-circle me-1"></i>
+          {{guardando ? 'Guardando...' : 'Confirmar Importación'}}
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover tabla-estandar">
+          <thead>
+            <tr>
+              <th>Código Bien</th>
+              <th>Descripción</th>
+              <th>Valor Inicial</th>
+              <th>Valor Final</th>
+              <th>Estado</th>
+              <th>Comprador</th>
+              <th>RUT Comprador</th>
+              <th>Comisión</th>
+              <th>Estado Validación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dato of datosPreview; let i = index"
+                [class.table-success]="!dato.tieneErrores"
+                [class.table-danger]="dato.tieneErrores">
+              <td>
+                <strong>{{dato.bienCodigo}}</strong>
+              </td>
+              <td>
+                <div class="descripcion-bien">
+                  {{dato.bienDescripcion}}
+                </div>
+              </td>
+              <td class="text-end">
+                ${{dato.valorInicial | number:'1.0-0'}}
+              </td>
+              <td class="text-end">
+                <strong>
+                  {{dato.valorFinal ? ('$' + (dato.valorFinal | number:'1.0-0')) : '-'}}
+                </strong>
+              </td>
+              <td>
+                <span class="badge"
+                      [class.bg-success]="dato.estado === 'Vendido'"
+                      [class.bg-secondary]="dato.estado === 'No Vendido'">
+                  {{dato.estado}}
+                </span>
+              </td>
+              <td>{{dato.comprador || '-'}}</td>
+              <td>{{dato.compradorRut || '-'}}</td>
+              <td class="text-end">
+                {{dato.comision ? (dato.comision + '%') : '-'}}
+              </td>
+              <td>
+                <span *ngIf="!dato.tieneErrores" class="badge bg-success">
+                  <i class="bi bi-check-circle me-1"></i>Válido
+                </span>
+                <span *ngIf="dato.tieneErrores" class="badge bg-danger">
+                  <i class="bi bi-exclamation-circle me-1"></i>Con errores
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial de importaciones -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-clock-history me-2"></i>Historial de Importaciones
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table tabla-estandar">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Archivo</th>
+              <th>Registros</th>
+              <th>Estado</th>
+              <th>Observaciones</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let importacion of historialImportaciones">
+              <td>{{importacion.fecha | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td>{{importacion.usuario}}</td>
+              <td>{{importacion.nombreArchivo}}</td>
+              <td class="text-center">
+                <span class="badge bg-info">{{importacion.registrosProcesados}}</span>
+              </td>
+              <td>
+                <span class="badge"
+                      [class.bg-success]="importacion.estado === 'Exitoso'"
+                      [class.bg-warning]="importacion.estado === 'Con errores'"
+                      [class.bg-danger]="importacion.estado === 'Fallido'">
+                  {{importacion.estado}}
+                </span>
+              </td>
+              <td>
+                <span class="text-muted small">{{importacion.observaciones}}</span>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-info me-1" 
+                        title="Ver detalles"
+                        (click)="verDetallesImportacion(importacion)">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" 
+                        title="Descargar log"
+                        (click)="descargarLog(importacion)">
+                  <i class="bi bi-download"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

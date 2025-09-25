@@ -1,4 +1,4 @@
-// src/app/features/Usuarios/Empleados/Empleados/empleados.component.scss
+// src/app/features/gestion-bienes/datos-bancarios/datos-bancarios.component.scss
 .container {
   font-family: 'Roboto', sans-serif;
   color: #2e2e2e;
@@ -27,8 +27,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1050;
-    max-width: 800px;
-    width: 95%;
+    max-width: 700px;
+    width: 90%;
   }
 
   .modal-content {
@@ -100,17 +100,6 @@
           cursor: not-allowed;
         }
       }
-
-      .btn-outline-info {
-        border-color: #17a2b8;
-        color: #17a2b8;
-
-        &:hover {
-          background-color: #17a2b8;
-          border-color: #17a2b8;
-          color: white;
-        }
-      }
     }
   }
 
@@ -119,40 +108,6 @@
     border: 1px solid #dcdcdc;
     border-radius: 8px;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
-  }
-
-  // Pestañas (Tabs)
-  .nav-tabs {
-    border-bottom: 2px solid #e9ecef;
-    margin-bottom: 1.5rem;
-
-    .nav-item {
-      margin-bottom: -2px;
-
-      .nav-link {
-        border: none;
-        color: #6c757d;
-        font-weight: 500;
-        padding: 0.75rem 1rem;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s ease;
-
-        &:hover {
-          color: #0055a5;
-          border-color: transparent;
-        }
-
-        &.active {
-          color: #0055a5;
-          background-color: transparent;
-          border-bottom-color: #0055a5;
-        }
-
-        i {
-          font-size: 0.9rem;
-        }
-      }
-    }
   }
 
   // Formularios
@@ -181,21 +136,7 @@
     }
   }
 
-  .input-group {
-    .input-group-text {
-      background-color: #e9ecef;
-      border: 1px solid #ced4da;
-      color: #495057;
-    }
-
-    .btn {
-      border-color: #ced4da;
-    }
-  }
-
   .form-check {
-    margin-bottom: 0.5rem;
-
     .form-check-input {
       &:checked {
         background-color: #0055a5;
@@ -210,12 +151,6 @@
     .form-check-label {
       font-size: 0.9rem;
       color: #495057;
-
-      small {
-        display: block;
-        color: #6c757d;
-        font-weight: normal;
-      }
     }
   }
 
@@ -227,23 +162,6 @@
   .text-danger {
     color: #dc3545 !important;
     font-size: 0.8rem;
-  }
-
-  // Grid de permisos
-  .permissions-grid {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    padding: 0.75rem;
-
-    .form-check {
-      margin-bottom: 1rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
   }
 
   // Botones
@@ -289,14 +207,14 @@
       }
     }
 
-    &.btn-outline-success {
-      border-color: #28a745;
-      color: #28a745;
+    &.btn-outline-info {
+      border-color: #17a2b8;
+      color: #17a2b8;
       background-color: transparent;
 
       &:hover {
-        background-color: #28a745;
-        border-color: #28a745;
+        background-color: #17a2b8;
+        border-color: #17a2b8;
         color: white;
       }
     }
@@ -313,22 +231,14 @@
       }
     }
 
-    &.btn-outline-info {
-      border-color: #17a2b8;
-      color: #17a2b8;
-      background-color: transparent;
-
-      &:hover {
-        background-color: #17a2b8;
-        border-color: #17a2b8;
-        color: white;
-      }
-    }
-
     &.btn-sm {
       padding: 0.25rem 0.5rem;
       font-size: 0.875rem;
       border-radius: 3px;
+    }
+
+    &.d-grid {
+      width: 100%;
     }
 
     i {
@@ -385,21 +295,21 @@
       }
     }
 
-    &.border-danger {
-      border-color: #dc3545 !important;
-      
-      .card-title {
-        color: #dc3545;
-        font-size: 1.75rem;
-        font-weight: 700;
-      }
-    }
-
     &.border-warning {
       border-color: #ffc107 !important;
       
       .card-title {
         color: #ffc107;
+        font-size: 1.75rem;
+        font-weight: 700;
+      }
+    }
+
+    &.border-danger {
+      border-color: #dc3545 !important;
+      
+      .card-title {
+        color: #dc3545;
         font-size: 1.75rem;
         font-weight: 700;
       }
@@ -446,8 +356,12 @@
             background-color: rgba(40, 167, 69, 0.1) !important;
           }
 
-          &.table-secondary {
-            background-color: rgba(108, 117, 125, 0.1) !important;
+          &.table-warning {
+            background-color: rgba(255, 193, 7, 0.1) !important;
+          }
+
+          &.table-danger {
+            background-color: rgba(220, 53, 69, 0.1) !important;
           }
 
           &:hover {
@@ -482,15 +396,20 @@
       }
     }
 
-    .usuario-info, .empleado-info {
+    .comitente-info {
+      strong {
+        font-weight: 600;
+        color: #495057;
+      }
+    }
+
+    .banco-info, .cuenta-info {
       strong {
         color: #495057;
-        font-weight: 600;
       }
 
       small {
         color: #6c757d;
-        font-size: 0.8rem;
       }
     }
   }
@@ -507,14 +426,14 @@
       color: white;
     }
 
-    &.bg-danger {
-      background-color: #dc3545 !important;
-      color: white;
-    }
-
     &.bg-warning {
       background-color: #ffc107 !important;
       color: #212529;
+    }
+
+    &.bg-danger {
+      background-color: #dc3545 !important;
+      color: white;
     }
 
     &.bg-info {
@@ -539,10 +458,6 @@
       color: #0c5460;
       background-color: #d1ecf1;
       border-color: #bee5eb;
-
-      i {
-        color: #0c5460;
-      }
 
       strong {
         color: #0c5460;
@@ -609,23 +524,22 @@
     gap: 0.5rem;
   }
 
-  .flex-wrap {
-    flex-wrap: wrap;
-  }
-
-  // Utilidades
+  // Utilidades de espaciado
   .mb-3 { margin-bottom: 1rem; }
   .mb-4 { margin-bottom: 1.5rem; }
   .me-1 { margin-right: 0.25rem; }
   .me-2 { margin-right: 0.5rem; }
-  .ms-1 { margin-left: 0.25rem; }
+  .mt-1 { margin-top: 0.25rem; }
+  .mt-2 { margin-top: 0.5rem; }
   .mt-4 { margin-top: 1.5rem; }
 
+  // Utilidades de texto
   .text-center { text-align: center; }
-  .text-end { text-align: right; }
   .text-muted { color: #6c757d !important; }
 
+  // Utilidades de display
   .d-flex { display: flex; }
+  .d-grid { display: grid; }
   .d-block { display: block; }
   .align-items-center { align-items: center; }
   .justify-content-between { justify-content: space-between; }
@@ -654,29 +568,22 @@
       padding: 0.75rem;
     }
 
-    .row .col-md-2,
     .row .col-md-3,
     .row .col-md-4,
-    .row .col-md-6 {
+    .row .col-md-6,
+    .row .col-md-8 {
       margin-bottom: 1rem;
     }
 
     .gap-2 {
       gap: 0.25rem;
+      flex-wrap: wrap;
     }
 
-    .usuario-info,
-    .empleado-info {
+    .comitente-info,
+    .banco-info,
+    .cuenta-info {
       font-size: 0.85rem;
-    }
-
-    .nav-tabs .nav-link {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.85rem;
-    }
-
-    .permissions-grid {
-      max-height: 150px;
     }
   }
 
@@ -689,11 +596,6 @@
 
     .modal-content {
       padding: 1rem;
-    }
-
-    .nav-tabs .nav-link {
-      padding: 0.4rem 0.6rem;
-      font-size: 0.8rem;
     }
   }
 }

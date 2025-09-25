@@ -1,0 +1,180 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">
+    <i class="bi bi-download me-2"></i>Extracción de Planilla de Bienes Nuevos
+  </h2>
+  
+  <!-- Filtros y controles -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros de Extracción</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Fecha Desde</label>
+          <input type="date" [(ngModel)]="filtros.fechaDesde" class="form-control">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Fecha Hasta</label>
+          <input type="date" [(ngModel)]="filtros.fechaHasta" class="form-control">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Estado</label>
+          <select [(ngModel)]="filtros.estado" class="form-select">
+            <option value="">Todos</option>
+            <option value="Nuevo">Nuevos</option>
+            <option value="En Subasta">En Subasta</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Comitente</label>
+          <input type="text" [(ngModel)]="filtros.comitente" placeholder="Filtrar por comitente" class="form-control">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <button class="btn btn-primary me-2" (click)="aplicarFiltros()">
+            <i class="bi bi-search me-1"></i>Aplicar Filtros
+          </button>
+          <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+            <i class="bi bi-x-circle me-1"></i>Limpiar
+          </button>
+        </div>
+        <div class="col-md-6 text-end">
+          <button class="btn btn-success me-2" (click)="exportarSeleccionados()" [disabled]="!haySeleccionados()">
+            <i class="bi bi-file-earmark-excel me-1"></i>Exportar Seleccionados ({{contarSeleccionados()}})
+          </button>
+          <button class="btn btn-info" (click)="exportarTodos()">
+            <i class="bi bi-download me-1"></i>Exportar Todos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">{{bienesFiltrados.length}}</h5>
+          <p class="card-text">Total Bienes</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success">{{contarPorEstado('Nuevo')}}</h5>
+          <p class="card-text">Bienes Nuevos</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-warning">
+        <div class="card-body">
+          <h5 class="card-title text-warning">{{contarPorEstado('En Subasta')}}</h5>
+          <p class="card-text">En Subasta</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-info">
+        <div class="card-body">
+          <h5 class="card-title text-info">${{calcularValorTotal() | number:'1.0-0'}}</h5>
+          <p class="card-text">Valor Total</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de bienes -->
+  <div class="tabla-contenedor">
+    <table class="table tabla-estandar">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" (change)="toggleSeleccionarTodos($event)" [checked]="todoSeleccionado()">
+          </th>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Comitente</th>
+          <th>Valor Inicial</th>
+          <th>Incremento</th>
+          <th>Porcentaje</th>
+          <th>Estado</th>
+          <th>Fecha Ingreso</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let bien of bienesFiltrados" 
+            [class.table-warning]="bien.bienEstado === 'En Subasta'"
+            [class.table-success]="bien.bienEstado === 'Nuevo'">
+          <td>
+            <input type="checkbox" [(ngModel)]="bien.seleccionado" name="chk_{{bien.bienId}}">
+          </td>
+          <td>
+            <strong>{{bien.bienCodigo}}</strong>
+          </td>
+          <td>
+            <div class="descripcion-bien">
+              {{bien.bienDescripcion}}
+            </div>
+          </td>
+          <td>{{bien.comitenteNombre}}</td>
+          <td class="text-end">
+            <strong>${{bien.bienValorInicial | number:'1.0-0'}}</strong>
+          </td>
+          <td class="text-end">
+            ${{bien.bienIncremento | number:'1.0-0'}}
+          </td>
+          <td class="text-end">
+            {{bien.bienPorcentaje}}%
+          </td>
+          <td>
+            <span class="badge" 
+                  [class.bg-success]="bien.bienEstado === 'Nuevo'"
+                  [class.bg-warning]="bien.bienEstado === 'En Subasta'"
+                  [class.bg-info]="bien.bienEstado === 'Vendido'"
+                  [class.bg-secondary]="bien.bienEstado === 'No Vendido'">
+              {{bien.bienEstado}}
+            </span>
+          </td>
+          <td>{{bien.bienFechaIngreso | date:'dd/MM/yyyy'}}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-info me-1" title="Ver detalles">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary" title="Editar">
+              <i class="bi bi-pencil"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Mensaje si no hay datos -->
+    <div *ngIf="bienesFiltrados.length === 0" class="text-center py-4">
+      <i class="bi bi-inbox display-4 text-muted"></i>
+      <p class="mt-2 text-muted">No se encontraron bienes con los filtros aplicados</p>
+      <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Ver todos los bienes
+      </button>
+    </div>
+
+    <!-- Paginación -->
+    <div class="paginacion d-flex justify-content-between align-items-center mt-3" *ngIf="bienesFiltrados.length > 0">
+      <div>
+        Mostrando {{bienesFiltrados.length}} de {{bienes.length}} bienes
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

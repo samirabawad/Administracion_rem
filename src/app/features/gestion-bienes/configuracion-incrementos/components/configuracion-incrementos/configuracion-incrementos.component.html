@@ -1,0 +1,377 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">
+    <i class="bi bi-gear me-2"></i>Configuración de Incrementos y Porcentajes
+  </h2>
+
+  <!-- Botón para nueva configuración -->
+  <button class="btn btn-primary mb-3" (click)="abrirModal()">
+    <i class="bi bi-plus-circle me-2"></i>Nueva Configuración
+  </button>
+
+  <!-- Modal para crear/editar configuración -->
+  <div class="modal-backdrop" *ngIf="modalVisible"></div>
+
+  <div class="modal-simple" *ngIf="modalVisible" role="dialog" aria-modal="true">
+    <form #form="ngForm" (ngSubmit)="guardarConfiguracion()" class="modal-content tarjeta tarjeta-elevada p-4">
+      <div class="modal-header">
+        <h5 class="modal-title encabezado-modal">
+          {{ modoEdicion ? 'Editar Configuración de Incremento' : 'Nueva Configuración de Incremento' }}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Rango Mínimo</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" 
+                     [(ngModel)]="nuevaConfiguracion.rangoMinimo" 
+                     name="rangoMinimo" 
+                     class="form-control" 
+                     placeholder="0"
+                     min="0"
+                     required>
+            </div>
+            <div *ngIf="form.submitted && !nuevaConfiguracion.rangoMinimo" class="text-danger mt-1 small">
+              El rango mínimo es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Rango Máximo</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" 
+                     [(ngModel)]="nuevaConfiguracion.rangoMaximo" 
+                     name="rangoMaximo" 
+                     class="form-control" 
+                     placeholder="999999999"
+                     min="1"
+                     required>
+            </div>
+            <div *ngIf="form.submitted && !nuevaConfiguracion.rangoMaximo" class="text-danger mt-1 small">
+              El rango máximo es obligatorio.
+            </div>
+            <div *ngIf="form.submitted && nuevaConfiguracion.rangoMaximo && nuevaConfiguracion.rangoMinimo && nuevaConfiguracion.rangoMaximo <= nuevaConfiguracion.rangoMinimo" 
+                 class="text-danger mt-1 small">
+              El rango máximo debe ser mayor al rango mínimo.
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Incremento</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" 
+                     [(ngModel)]="nuevaConfiguracion.incremento" 
+                     name="incremento" 
+                     class="form-control" 
+                     placeholder="10000"
+                     min="1000"
+                     step="1000"
+                     required>
+            </div>
+            <small class="form-text text-muted">Valor en pesos chilenos (mínimo $1.000)</small>
+            <div *ngIf="form.submitted && !nuevaConfiguracion.incremento" class="text-danger mt-1 small">
+              El incremento es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Porcentaje de Comisión</label>
+            <div class="input-group">
+              <input type="number" 
+                     [(ngModel)]="nuevaConfiguracion.porcentaje" 
+                     name="porcentaje" 
+                     class="form-control" 
+                     placeholder="5"
+                     min="0"
+                     max="50"
+                     step="0.1"
+                     required>
+              <span class="input-group-text">%</span>
+            </div>
+            <small class="form-text text-muted">Porcentaje de comisión (0% - 50%)</small>
+            <div *ngIf="form.submitted && !nuevaConfiguracion.porcentaje" class="text-danger mt-1 small">
+              El porcentaje es obligatorio.
+            </div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label">Estado</label>
+            <select [(ngModel)]="nuevaConfiguracion.activo" name="activo" class="form-select" required>
+              <option [ngValue]="true">Activo</option>
+              <option [ngValue]="false">Inactivo</option>
+            </select>
+          </div>
+
+          <!-- Preview del rango -->
+          <div class="col-12" *ngIf="nuevaConfiguracion.rangoMinimo && nuevaConfiguracion.rangoMaximo">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>Rango:</strong> 
+              ${{nuevaConfiguracion.rangoMinimo | number:'1.0-0'}} - 
+              ${{nuevaConfiguracion.rangoMaximo | number:'1.0-0'}}
+              <br>
+              <strong>Incremento:</strong> ${{nuevaConfiguracion.incremento | number:'1.0-0'}}
+              <br>
+              <strong>Comisión:</strong> {{nuevaConfiguracion.porcentaje}}%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resumen de configuraciones -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">{{configuraciones.length}}</h5>
+          <p class="card-text">Total Configuraciones</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success">{{contarActivas()}}</h5>
+          <p class="card-text">Configuraciones Activas</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-warning">
+        <div class="card-body">
+          <h5 class="card-title text-warning">{{contarInactivas()}}</h5>
+          <p class="card-text">Configuraciones Inactivas</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center border-info">
+        <div class="card-body">
+          <h5 class="card-title text-info">{{calcularRangoTotal() | number:'1.0-0'}}</h5>
+          <p class="card-text">Rango Total Cubierto</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Estado</label>
+          <select [(ngModel)]="filtroEstado" class="form-select" (change)="aplicarFiltros()">
+            <option value="todos">Todos</option>
+            <option value="activos">Solo Activos</option>
+            <option value="inactivos">Solo Inactivos</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Rango Mínimo</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" [(ngModel)]="filtroRangoMin" class="form-control" placeholder="Desde" (input)="aplicarFiltros()">
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Rango Máximo</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" [(ngModel)]="filtroRangoMax" class="form-control" placeholder="Hasta" (input)="aplicarFiltros()">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 text-end">
+          <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+            <i class="bi bi-x-circle me-1"></i>Limpiar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de configuraciones -->
+  <div class="tabla-contenedor">
+    <table class="table tabla-estandar">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" (change)="toggleSeleccionarTodos($event)" [checked]="todoSeleccionado()">
+          </th>
+          <th>Rango de Valores</th>
+          <th>Incremento</th>
+          <th>Porcentaje</th>
+          <th>Estado</th>
+          <th>Fecha Creación</th>
+          <th>Última Modificación</th>
+          <th style="width: 150px;" class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let config of configuracionesFiltradas" 
+            [class.table-success]="config.activo"
+            [class.table-secondary]="!config.activo">
+          <td>
+            <input type="checkbox" [(ngModel)]="config.seleccionado" name="chk_{{config.configId}}">
+          </td>
+          <td>
+            <div class="rango-valores">
+              <strong>${{config.rangoMinimo | number:'1.0-0'}}</strong>
+              <span class="text-muted mx-2">-</span>
+              <strong>${{config.rangoMaximo | number:'1.0-0'}}</strong>
+            </div>
+            <small class="text-muted">
+              Diferencia: ${{(config.rangoMaximo - config.rangoMinimo) | number:'1.0-0'}}
+            </small>
+          </td>
+          <td class="text-end">
+            <strong class="text-primary">${{config.incremento | number:'1.0-0'}}</strong>
+          </td>
+          <td class="text-center">
+            <span class="badge bg-info">{{config.porcentaje}}%</span>
+          </td>
+          <td>
+            <span class="badge"
+                  [class.bg-success]="config.activo"
+                  [class.bg-secondary]="!config.activo">
+              {{config.activo ? 'Activo' : 'Inactivo'}}
+            </span>
+          </td>
+          <td>
+            <small>{{config.fechaCreacion | date:'dd/MM/yyyy'}}</small>
+          </td>
+          <td>
+            <small>{{config.fechaModificacion | date:'dd/MM/yyyy HH:mm'}}</small>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-1" 
+                    title="Editar"
+                    (click)="editarConfiguracion(config)">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm" 
+                    [class.btn-outline-warning]="config.activo"
+                    [class.btn-outline-success]="!config.activo"
+                    [title]="config.activo ? 'Desactivar' : 'Activar'"
+                    (click)="toggleEstado(config)">
+              <i class="bi" [class.bi-pause]="config.activo" [class.bi-play]="!config.activo"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger ms-1" 
+                    title="Eliminar"
+                    (click)="eliminarConfiguracion(config.configId)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Mensaje si no hay datos -->
+    <div *ngIf="configuracionesFiltradas.length === 0" class="text-center py-4">
+      <i class="bi bi-gear display-4 text-muted"></i>
+      <p class="mt-2 text-muted">No se encontraron configuraciones con los filtros aplicados</p>
+      <button class="btn btn-outline-primary" (click)="limpiarFiltros()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Ver todas las configuraciones
+      </button>
+    </div>
+
+    <!-- Paginación -->
+    <div class="paginacion d-flex justify-content-between align-items-center mt-3" *ngIf="configuracionesFiltradas.length > 0">
+      <div>
+        Mostrando {{configuracionesFiltradas.length}} de {{configuraciones.length}} configuraciones
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Acciones masivas -->
+  <div class="card mt-4" *ngIf="haySeleccionados()">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-check me-2"></i>Acciones Masivas ({{contarSeleccionados()}} seleccionadas)
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-success" (click)="activarSeleccionadas()">
+          <i class="bi bi-play me-1"></i>Activar Seleccionadas
+        </button>
+        <button class="btn btn-outline-warning" (click)="desactivarSeleccionadas()">
+          <i class="bi bi-pause me-1"></i>Desactivar Seleccionadas
+        </button>
+        <button class="btn btn-outline-danger" (click)="eliminarSeleccionadas()">
+          <i class="bi bi-trash me-1"></i>Eliminar Seleccionadas
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial de cambios -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-clock-history me-2"></i>Historial de Cambios Recientes
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Acción</th>
+              <th>Configuración</th>
+              <th>Detalles</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cambio of historialCambios">
+              <td>
+                <small>{{cambio.fecha | date:'dd/MM/yyyy HH:mm'}}</small>
+              </td>
+              <td>{{cambio.usuario}}</td>
+              <td>
+                <span class="badge"
+                      [class.bg-success]="cambio.accion === 'Crear'"
+                      [class.bg-primary]="cambio.accion === 'Editar'"
+                      [class.bg-warning]="cambio.accion === 'Activar' || cambio.accion === 'Desactivar'"
+                      [class.bg-danger]="cambio.accion === 'Eliminar'">
+                  {{cambio.accion}}
+                </span>
+              </td>
+              <td>{{cambio.configuracion}}</td>
+              <td>
+                <small class="text-muted">{{cambio.detalles}}</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
