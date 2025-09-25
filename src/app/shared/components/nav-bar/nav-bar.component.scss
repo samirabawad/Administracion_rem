@@ -1,0 +1,208 @@
+@import '../../../../styles.scss';
+
+    //oculta nav mobile
+    .nav-item-mobile {
+          display: none;
+    }
+    .dropdown-menu-dark {
+      background-color: #0e2a47;
+      border: none;
+      
+      .dropdown-item {
+        color: #ffffffcc;
+        font-size: 0.95rem;
+        padding: 0.5rem 1.25rem;
+
+        &:hover {
+          background-color: #15406b;
+          color: #ffffff;
+        }
+      }
+    }
+
+
+    // Navbar principal
+    .navbar-lg {
+          padding: 0;
+          margin: 0;
+          background-color: #092039;
+      
+          .navbar-logo-container {
+              padding: 0;
+              margin: 0;
+              display: inline-block;
+          }
+                        // Estilos para los enlaces (links)
+          .text-underline {
+              text-decoration: underline !important;
+              text-underline-offset: 0.15em; // Reducido para acercarlo al texto
+              text-decoration-color: rgba(255, 255, 255, 0.7);
+              transition: all 0.3s ease;
+              &:hover {
+                  text-decoration: none !important;
+                  color: #ffffff; // Cambia el color al blanco, sin agregar brillo
+              }
+          }
+
+          .navbar-logo {
+              width: auto;
+              height: 80px;
+              max-width: 250px;
+              margin: 0 0 0 5rem;
+              padding: 0;
+              object-fit: contain;
+              display: block;
+          }
+
+          .navbar-toggler {
+              min-height: 70px;
+              padding: 0;
+              font-size: 16px;
+              border: none;
+              color: #fff;    
+              &:not(:disabled) {
+                cursor: pointer;
+              }
+          }
+
+          .navbar-collapse {
+              flex-grow: 0;
+          }
+
+          .navbar-nav {
+              margin-left: auto;
+          }
+
+          .nav-item {
+              margin-left: 1rem;
+              margin-right: 1rem;
+              display: flex;
+              align-items: center; // Para el align-middle
+          
+              .nav-link {
+                  @extend .body-link-small;
+                  @extend .text-underline;
+                  color: #fffffffb;
+                  position: relative;
+                  padding: 0.5rem 0;
+                  transition: text-shadow 0.3s ease; // Suavizar el cambio
+                  &:hover {
+                      font-size: 1rem;
+                      font-weight: bold;
+                      color: #FFFFFF;
+                  }
+              }
+              
+              .badge {
+                  position: absolute;
+                  top: -5px;
+                  right: -10px;
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 50%;
+                  background-color: #dc3545;
+                  color: white;
+              }
+
+              i.bi-cart {
+                  font-size: 1.2rem;
+                  color: rgba(255, 255, 255, 0.8);
+                  transition: color 0.3s ease;
+                  &:hover {
+                    color: #fff;
+                  }
+              }
+
+          }
+    }
+
+
+    /* Estilos para tablets y mobiles */
+    @media (max-width: 991px) {
+
+      .navbar-lg {
+
+        /* Contenedor flexible para carrito y botón */
+        .mobile-controls {
+          display: flex;
+          align-items: center; // Centra verticalmente
+          gap: 12px; // Espacio entre carrito y botón (ajusta según necesites)
+          margin-left: auto; // Empuja el grupo a la derecha
+        }
+
+        .nav-item-desktop {
+          display: none;
+        }
+
+        .nav-item-mobile{
+          display: flex !important; // Fuerza visibilidad en móviles
+          align-items: center; // Centra el texto y las barras
+          margin: 0; // Elimina márgenes por defecto
+          padding: 0;
+          list-style: none; // Quita el bullet point de <li>
+          justify-content: center;
+          color: #fff;
+          min-height: 20px;
+          font-size: 16px;
+          border: none;
+        }
+
+        //Textos Menu/Cerrar y sus iconos
+        .navbar-toggler {
+          min-height: 60px;
+          padding: 0;
+          font-size: 16px;
+          border: none;
+          color: #fff;
+          display: flex;
+          align-items: center; // Centra el texto y las barras
+          justify-content: center;
+          .space {
+            margin-left: 8px; // Espacio entre el icono y el texto
+          }
+          .menu-text {
+            display: none; // Ocultar el texto por defecto
+            font-size: 1rem;
+            font-weight: bold;
+            padding-left: 1rem;
+            display: inline-block; // Muestra el texto en móviles
+          }
+        }
+
+        .navbar-logo {
+              margin-left: 1rem;
+              height: 60px;
+        }
+
+        .nav-item-desktop {
+              display: none;
+        }
+
+        // Cambios para la alineación a la izquierda de los nav-item en versión móvil (nav-items del menú)
+        .navbar-nav {
+              display: block; // Esto hace que los elementos se alineen verticalmente
+              padding: 0;
+              margin: 0;
+              width: 100%; // Asegura que ocupe todo el ancho disponible
+              
+            .nav-item {
+                margin-left: 0;  // Elimina el margen entre elementos
+                margin-right: 0;
+                display: block;  // Cambia de flex a block para que se alineen verticalmente
+                width: 100%;  // Esto asegura que cada item ocupe todo el ancho disponible
+                padding: 0.5rem 0;
+            }
+
+            .nav-link {
+                text-align: left;  // Alinea el texto a la izquierda
+                padding-left: 1rem; // Agrega algo de espacio a la izquierda si es necesario
+            }
+              
+            .app-clave-unica {
+                text-align: left;  // Alinea el texto a la izquierda
+                padding-left: 1rem; // Agrega algo de espacio a la izquierda si es necesario
+            }
+        }
+      }
+    } 
+
+

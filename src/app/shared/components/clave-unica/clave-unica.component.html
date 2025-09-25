@@ -1,0 +1,27 @@
+<button
+class="clave-unica-button"
+[class.mobile]="isMobile"
+[class.secondary]="hasMenu"
+(click)="loginClaveUnica()"
+>
+<img
+  src="assets/icons/claveunica/cu-blanco.svg"
+  alt="Clave Única"
+  class="icon"
+  [class.mobile]="isMobile"
+/>
+<span class="button-text">{{ buttonText }}</span>
+<img
+  *ngIf="hasMenu"
+  src="assets/arrow-drop-down.svg"
+  alt="Menú"
+  class="arrow-icon"
+/>
+
+<!-- Tu botón de Clave Única -->
+<button (click)="loginClaveUnica()">
+  Iniciar con Clave Única
+</button>
+
+
+</button>

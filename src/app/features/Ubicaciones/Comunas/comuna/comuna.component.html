@@ -1,0 +1,167 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">Mantenedor de Comunas</h2>
+  
+  <!-- Botón para abrir modal -->
+  <button class="btn btn-primario mb-3" (click)="abrirModal()">
+    <span class="icono">＋</span> Nueva Comuna
+  </button>
+
+  <div class="modal-backdrop" *ngIf="modalVisible"></div>
+
+  <div class="modal-simple" *ngIf="modalVisible" role="dialog" aria-modal="true">
+    <form #form="ngForm" (ngSubmit)="guardarComuna()" class="modal-content tarjeta tarjeta-elevada p-4">
+      <div class="modal-header">
+        <h5 class="modal-title encabezado-modal">
+          {{ modoEdicion ? 'Editar Comuna' : 'Crear Nueva Comuna' }}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="form-group mb-3">
+          <small class="form-text text-muted d-block mb-1">Nombre de la Comuna</small>
+          <input
+            [(ngModel)]="nuevaComunaNombre"
+            name="nombre"
+            id="nombre"
+            type="text"
+            #nombreInput
+            class="form-control"
+            placeholder="Ej: Santiago"
+            required
+            autofocus
+          />
+          <div *ngIf="form.submitted && !nuevaComunaNombre.trim()" class="text-danger mt-1 small">
+            El nombre de la comuna es obligatorio.
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <small class="form-text text-muted d-block mb-1">Provincia</small>
+          <select
+            [(ngModel)]="nuevaComunaProvincia"
+            name="provinciaId"
+            id="provinciaId"
+            class="form-select"
+            required
+          >
+            <option [ngValue]="null" disabled selected>Seleccione una provincia</option>
+            <option *ngFor="let prov of provincias" [ngValue]="prov.provinciaId">{{ prov.provinciaNombre }}</option>
+          </select>
+          <div *ngIf="form.submitted && nuevaComunaProvincia === null" class="text-danger mt-1 small">
+            La provincia es obligatoria.
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <small class="form-text text-muted d-block mb-1">Estado</small>
+          <select
+            [(ngModel)]="nuevaComunaActivo"
+            name="activo"
+            id="activo"
+            class="form-select"
+            required
+          >
+            <option [ngValue]="null" disabled selected>Seleccione estado</option>
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option>
+          </select>
+          <div *ngIf="form.submitted && nuevaComunaActivo === null" class="text-danger mt-1 small">
+            El estado de la comuna es obligatorio.
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input
+        type="text"
+        [(ngModel)]="filtroNombre"
+        class="form-control"
+        placeholder="Filtrar por nombre"
+      />
+    </div>
+    <div class="col-md-6">
+      <select class="form-select" [(ngModel)]="filtroEstado">
+        <option value="todos">Todos los estados</option>
+        <option value="activos">Activos</option>
+        <option value="inactivos">Inactivos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="tabla-contenedor">
+    <table class="table tabla-estandar">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" (change)="toggleSeleccionarTodo($event)" />
+          </th>
+          <th><span class="encabezado-tabla">Nombre</span></th>
+          <th><span class="encabezado-tabla">Provincia</span></th>
+          <th><span class="encabezado-tabla">Estado</span></th>
+          <th style="width: 150px;" class="text-center"><span class="encabezado-tabla">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let comuna of comunasFiltradas">
+          <td>
+            <input type="checkbox" [(ngModel)]="comuna.seleccionada" name="chk_{{comuna.comunaId}}" />
+          </td>
+          <td>{{ comuna.comunaNombre }}</td>
+          <td>{{ obtenerNombreProvincia(comuna.provinciaId) }}</td>
+          <td>
+            <div class="estado-container">
+              <span class="estado-texto" [ngClass]="comuna.comunaActivo ? 'text-success' : 'text-danger'">
+                {{ comuna.comunaActivo ? 'Activa' : 'Inactiva' }}
+              </span>
+            </div>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-icono btn-info me-2" title="Ver" disabled>
+              <i class="bi bi-eye-fill"></i>
+            </button>
+            <button class="btn btn-sm btn-icono btn-warning me-2" title="Editar" (click)="editarComuna(comuna)">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button class="btn btn-sm btn-icono btn-danger" title="Eliminar" (click)="eliminarComuna(comuna.comunaId)">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="paginacion d-flex justify-content-between align-items-center mt-3">
+      <div>
+        Mostrar 
+        <select class="form-select d-inline-block w-auto ms-1 me-1">
+          <option>5</option>
+          <option>10</option>
+          <option>25</option>
+        </select>
+        registros
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

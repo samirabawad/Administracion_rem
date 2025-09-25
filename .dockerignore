@@ -1,0 +1,25 @@
+# Node.js y npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Angular build artifacts
+dist/
+build/
+.aot/
+.ng/
+
+# Cache de Angular CLI
+.cache/
+.angular/
+
+# Archivos de entorno y configuración .env… por agregar
+
+# Archivos de TypeScript
+*.tsbuildinfo
+
+# Git
+.git/
+.gitignore
+

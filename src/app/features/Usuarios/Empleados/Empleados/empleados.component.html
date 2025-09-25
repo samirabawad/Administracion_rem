@@ -1,0 +1,194 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">Mantenedor de Empleados</h2>
+
+  <!-- Botón para abrir modal -->
+  <button class="btn btn-primario mb-3" (click)="abrirModal()">
+    <span class="icono">＋</span> Nuevo Empleado
+  </button>
+
+  <div class="modal-backdrop" *ngIf="modalVisible"></div>
+
+  <div class="modal-simple" *ngIf="modalVisible" role="dialog" aria-modal="true">
+    <form #form="ngForm" (ngSubmit)="guardarEmpleado()" class="modal-content tarjeta tarjeta-elevada p-4">
+      <div class="modal-header">
+        <h5 class="modal-title encabezado-modal">
+          {{ modoEdicion ? 'Editar Empleado' : 'Crear Nuevo Empleado' }}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Usuario</small>
+            <input [(ngModel)]="nuevoEmpleado.empUsuario" name="usuario" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">RUT</small>
+            <input [(ngModel)]="nuevoEmpleado.empRut" name="rut" type="number" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Dígito Verificador</small>
+            <input [(ngModel)]="nuevoEmpleado.empRutDig" name="dv" class="form-control" maxlength="1" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Nombre</small>
+            <input [(ngModel)]="nuevoEmpleado.empNombre" name="nombre" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Segundo Nombre</small>
+            <input [(ngModel)]="nuevoEmpleado.empSegundoNombre" name="segundoNombre" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Apellido</small>
+            <input [(ngModel)]="nuevoEmpleado.empApellido" name="apellido" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Segundo Apellido</small>
+            <input [(ngModel)]="nuevoEmpleado.empSegundoApellido" name="segundoApellido" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Anexo</small>
+            <input [(ngModel)]="nuevoEmpleado.empAnexo" name="anexo" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Correo</small>
+            <input [(ngModel)]="nuevoEmpleado.empCorreo" name="correo" type="email" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Perfil</small>
+            <select [(ngModel)]="nuevoEmpleado.perfilId" name="perfilId" class="form-select" required>
+              <option [ngValue]="null" disabled selected>Seleccione perfil</option>
+              <option *ngFor="let perfil of perfiles" [ngValue]="perfil.perfilId">{{ perfil.perfilNombre }}</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Sucursal</small>
+            <select [(ngModel)]="nuevoEmpleado.sucursalId" name="sucursalId" class="form-select" required>
+              <option [ngValue]="null" disabled selected>Seleccione sucursal</option>
+              <option *ngFor="let sucursal of sucursales" [ngValue]="sucursal.sucursalId">
+                {{ sucursal.sucursalNombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Método de Autenticación</small>
+            <select [(ngModel)]="nuevoEmpleado.authMethod" name="authMethod" class="form-select" required>
+              <option [ngValue]="0">Contraseña</option>
+              <option [ngValue]="1">LDAP</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Contraseña</small>
+            <input [(ngModel)]="nuevoEmpleado.password" name="password" type="password" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Estado</small>
+            <select [(ngModel)]="nuevoEmpleado.empActivo" name="activo" class="form-select" required>
+              <option [ngValue]="true">Activo</option>
+              <option [ngValue]="false">Inactivo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input [(ngModel)]="filtroNombre" type="text" class="form-control" placeholder="Filtrar por nombre o usuario" />
+    </div>
+    <div class="col-md-6">
+      <select class="form-select" [(ngModel)]="filtroEstado">
+        <option value="todos">Todos los estados</option>
+        <option value="activos">Activos</option>
+        <option value="inactivos">Inactivos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tabla de Empleados -->
+  <div class="tabla-contenedor">
+    <table class="table tabla-estandar">
+      <thead>
+        <tr>
+          <th style="width: 40px;"><input type="checkbox" (change)="toggleSeleccionarTodo($event)" /></th>
+          <th>Usuario</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Perfil</th>
+          <th>Sucursal</th>
+          <th>Estado</th>
+          <th style="width: 150px;" class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let empleado of empleadosFiltrados">
+          <td><input type="checkbox" [(ngModel)]="empleado.seleccionada" /></td>
+          <td>{{ empleado.empUsuario }}</td>
+          <td>{{ empleado.empNombre }} {{ empleado.empApellido }}</td>
+          <td>{{ empleado.empCorreo }}</td>
+          <td>{{ obtenerNombrePerfil(empleado.perfilId) }}</td>
+          <td>{{ obtenerNombreSucursal(empleado.sucursalId) }}</td>
+          <td>
+            <span [ngClass]="empleado.empActivo ? 'text-success' : 'text-danger'">
+              {{ empleado.empActivo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-icono btn-info me-2" title="Ver" disabled>
+              <i class="bi bi-eye-fill"></i>
+            </button>
+            <button class="btn btn-sm btn-icono btn-warning me-2" title="Editar" (click)="editarEmpleado(empleado)">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button class="btn btn-sm btn-icono btn-danger" title="Eliminar" (click)="eliminarEmpleado(empleado.empId)">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="paginacion d-flex justify-content-between align-items-center mt-3">
+      <div>
+        Mostrar
+        <select class="form-select d-inline-block w-auto ms-1 me-1">
+          <option>5</option>
+          <option>10</option>
+          <option>25</option>
+        </select>
+        registros
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

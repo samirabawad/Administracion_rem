@@ -1,0 +1,17 @@
+# named network 'dicrep' is marked as "external" (used by service 'adminremates'), so either remove "external" from network definition or it needs to be created using: docker network create -d bridge dicrep
+name: adminremates
+services:
+    adminremates:
+        container_name: dicrep_adminremates_test_v1
+        ports:
+            - 4200:4200
+        networks:
+            - dicrep
+        image: dicrep/adminremates:test-v1
+networks:
+    dicrep:
+        external: true
+        name: dicrep
+
+
+

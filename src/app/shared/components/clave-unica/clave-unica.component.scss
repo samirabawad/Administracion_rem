@@ -1,0 +1,67 @@
+:host {
+    display: inline-block;
+  }
+
+  .clave-unica-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    padding: 8px 14px;
+    background-color: #0F69C4;
+    border-radius: 0;
+    height: calc(2rem + 16px);
+    transition: background-color 0.3s ease-in-out;
+}
+
+  .clave-unica-button:hover {
+    background-color: #0B4E91;
+  }
+
+  .clave-unica-button:active {
+    background-color: #07305A;
+  }
+
+  .clave-unica-button:focus {
+    outline: 4px solid rgba(255, 190, 92, 1);
+    background-color: #0B4E91;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+  }
+
+  .button-text {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #FFFFFF;
+  }
+
+  .arrow-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
+  }
+
+  .clave-unica-button.mobile {
+    padding: 12px 8px;
+    background-color: #0051A8;
+    height: calc(1.313rem + 24px);
+  }
+
+  .clave-unica-button.mobile .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .clave-unica-button.mobile .button-text {
+    font-size: 0.9rem;
+  }
+
+  .clave-unica-button.mobile:active {
+    background-color: #00254D;
+  }

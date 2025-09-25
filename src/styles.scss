@@ -1,0 +1,207 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the theme object.
+$frontend_sala_ventas-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$blue-palette,
+  ),
+  density: (
+    scale: 0,
+  )
+));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+:root {
+  @include mat.all-component-themes($frontend_sala_ventas-theme);
+}
+
+// Comment out the line below if you want to use the pre-defined typography utility classes.
+// For more information: https://material.angular.io/guide/typography#using-typography-styles-in-your-application.
+// @include mat.typography-hierarchy($frontend_sala_ventas-theme);
+
+// Comment out the line below if you want to use the deprecated `color` inputs.
+// @include mat.color-variants-backwards-compatibility($frontend_sala_ventas-theme);
+/* You can add global styles to this file, and also import other style files */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+// Variables de tipografía
+$font-primary: 'Roboto', sans-serif;
+
+// Mixin para definir estilos tipográficos
+@mixin typography($size, $weight: 400) {
+  font-family: $font-primary;
+  font-size: $size;
+  line-height: 1.5;
+  font-weight: $weight;
+}
+
+// Tipografías para desktop
+.heading-xl {
+  @include typography(48px, 700);
+}
+
+.heading-l {
+  @include typography(36px, 500);
+}
+
+.heading-m {
+  @include typography(31px, 500);
+}
+
+.heading-s {
+  @include typography(19px, 500);
+}
+
+.body-l {
+  @include typography(24px, 700);
+}
+
+.body-l-bold {
+    @include typography(24px, 700);
+  }
+
+.body-m {
+  @include typography(19px, 400);
+}
+
+.body-m-bold {
+  @include typography(19px, 700);
+}
+
+.body-s {
+  @include typography(16px, 400);
+}
+
+.body-s-bold {
+  @include typography(16px, 700);
+}
+
+.body-xs {
+  @include typography(14px, 400);
+}
+
+.body-xs-bold {
+  @include typography(14px, 700);
+}
+
+.body-button {
+    @include typography(19px, 500);
+}
+
+.body-button-bold {
+    @include typography(19px, 700);
+}
+
+.body-button-small {
+    @include typography(16px, 500);
+}
+
+.body-button-small-bold {
+    @include typography(16px, 700);
+}
+
+.body-link {
+    @include typography(1.1875rem, 500);
+}
+
+.body-link-bold {
+    @include typography(1.1875rem, 500);
+}
+
+.body-link-small {
+    @include typography(1rem, 400);
+}
+
+.body-link-small-bold {
+    @include typography(1rem, 700);
+  }
+
+  
+
+
+
+// Estilos para Mobile
+@media (max-width: 768px) {
+  .heading-xl {
+    @include typography(32px, 400);
+  }
+  .heading-l {
+    @include typography(24px, 500);
+  }
+  .heading-m {
+    @include typography(18px, 500);
+  }
+  .heading-s {
+    @include typography(16px, 500);
+  }
+  .body-l {
+    @include typography(18px, 500);
+  }
+  .body-l-bold {
+    @include typography(18px, 700);
+  }
+  .body-m {
+    @include typography(16px, 400);
+  }
+  .body-m-bold {
+    @include typography(16px, 700);
+  }
+  .body-s {
+    @include typography(14px, 400);
+  }
+  .body-s-bold {
+    @include typography(14px, 700);
+  }
+  .body-xs {
+    @include typography(12px, 400);
+  }
+  .body-xs-bold {
+    @include typography(12px, 700);
+  }
+  .body-button {
+    @include typography(1rem, 500);
+  }
+  .body-button-bold {
+    @include typography(1.6rem, 500);
+  }
+  .body-button-small {
+    @include typography(1rem, 500);
+  }
+  .body-button-small-bold {
+    @include typography(1.6rem, 500);
+  }
+  .body-link {
+    @include typography(1rem, 500);
+  }
+  .body-link-bold {
+    @include typography(1.1875rem, 500);
+  }
+  .body-link-small {
+    @include typography(1rem, 400);
+  }
+  .body-link-small-bold {
+    @include typography(1rem, 700);
+  }
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

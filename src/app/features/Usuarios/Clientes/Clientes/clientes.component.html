@@ -1,0 +1,172 @@
+<div class="container">
+  <h2 class="mb-4 titulo-seccion">Mantenedor de Clientes</h2>
+
+  <button class="btn btn-primario mb-3" (click)="abrirModal()">
+    <span class="icono">＋</span> Nuevo Cliente
+  </button>
+
+  <div class="modal-backdrop" *ngIf="modalVisible"></div>
+
+  <div class="modal-simple" *ngIf="modalVisible" role="dialog" aria-modal="true">
+    <form #form="ngForm" (ngSubmit)="guardarCliente()" class="modal-content tarjeta tarjeta-elevada p-4">
+      <div class="modal-header">
+        <h5 class="modal-title encabezado-modal">
+          {{ modoEdicion ? 'Editar Cliente' : 'Crear Nuevo Cliente' }}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Nombre</small>
+            <input [(ngModel)]="nuevoCliente.clienteNombre" name="clienteNombre" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Segundo Nombre</small>
+            <input [(ngModel)]="nuevoCliente.clienteSegundoNombre" name="clienteSegundoNombre" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Apellido</small>
+            <input [(ngModel)]="nuevoCliente.clienteApellido" name="clienteApellido" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Segundo Apellido</small>
+            <input [(ngModel)]="nuevoCliente.clienteSegundoApellido" name="clienteSegundoApellido" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Correo</small>
+            <input [(ngModel)]="nuevoCliente.clienteCorreo" name="clienteCorreo" type="email" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Teléfono</small>
+            <input [(ngModel)]="nuevoCliente.clienteTelefono" name="clienteTelefono" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">RUT</small>
+            <input [(ngModel)]="nuevoCliente.clienteRut" name="clienteRut" type="number" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Dígito Verificador</small>
+            <input [(ngModel)]="nuevoCliente.clienteRutDig" name="clienteRutDig" maxlength="1" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Calle</small>
+            <input [(ngModel)]="nuevoCliente.clienteCalle" name="clienteCalle" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Número</small>
+            <input [(ngModel)]="nuevoCliente.clienteNumeroCalle" name="clienteNumeroCalle" class="form-control" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Villa o Población</small>
+            <input [(ngModel)]="nuevoCliente.clienteVillaPoblacion" name="clienteVillaPoblacion" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Departamento</small>
+            <input [(ngModel)]="nuevoCliente.clienteDepto" name="clienteDepto" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Es Empresa</small>
+            <select [(ngModel)]="nuevoCliente.clienteEsEmpresa" name="clienteEsEmpresa" class="form-select" required>
+              <option [ngValue]="true">Sí</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Género</small>
+            <select [(ngModel)]="nuevoCliente.generoId" name="generoId" class="form-select" required>
+              <option [ngValue]="null" disabled selected>Seleccione género</option>
+              <option *ngFor="let genero of generos" [ngValue]="genero.generoId">{{ genero.generoDescr }}</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <small class="form-text text-muted d-block mb-1">Comuna</small>
+            <select [(ngModel)]="nuevoCliente.comunaId" name="comunaId" class="form-select" required>
+              <option [ngValue]="null" disabled selected>Seleccione comuna</option>
+              <option *ngFor="let comuna of comunas" [ngValue]="comuna.comunaId">{{ comuna.comunaNombre }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtros y Tabla -->
+  <div class="row mb-3 mt-4">
+    <div class="col-md-6">
+      <input [(ngModel)]="filtroNombre" type="text" class="form-control" placeholder="Filtrar por nombre o RUT" />
+    </div>
+    <div class="col-md-6">
+      <select class="form-select" [(ngModel)]="filtroEstado">
+        <option value="todos">Todos</option>
+        <option value="empresa">Empresas</option>
+        <option value="persona">Personas</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tabla-contenedor">
+    <table class="table tabla-estandar">
+      <thead>
+        <tr>
+          <th><input type="checkbox" (change)="toggleSeleccionarTodo($event)" /></th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Comuna</th>
+          <th>Género</th>
+          <th>Es Empresa</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientesFiltrados">
+          <td><input type="checkbox" [(ngModel)]="cliente.seleccionada" /></td>
+          <td>{{ cliente.clienteNombre }} {{ cliente.clienteApellido }}</td>
+          <td>{{ cliente.clienteCorreo }}</td>
+          <td>{{ cliente.clienteTelefono }}</td>
+          <td>{{ obtenerNombreComuna(cliente.comunaId) }}</td>
+          <td>{{ obtenerNombreGenero(cliente.generoId) }}</td>
+          <td>
+            <span [ngClass]="cliente.clienteEsEmpresa ? 'text-success' : 'text-secondary'">
+              {{ cliente.clienteEsEmpresa ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-icono btn-info me-2" title="Ver" disabled>
+              <i class="bi bi-eye-fill"></i>
+            </button>
+            <button class="btn btn-sm btn-icono btn-warning me-2" title="Editar" (click)="editarCliente(cliente)">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button class="btn btn-sm btn-icono btn-danger" title="Eliminar" (click)="eliminarCliente(cliente.clienteId)">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

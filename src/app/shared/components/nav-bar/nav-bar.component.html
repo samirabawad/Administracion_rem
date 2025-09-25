@@ -1,0 +1,102 @@
+
+<nav class="navbar navbar-dark navbar-expand-lg navbar-lg">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand" routerLink="/">
+      <img src="assets/logo/logo_dicrep_recortado.png" alt="Logo DICREP" class="navbar-logo" />
+    </a>
+
+    <!-- Contenedor fijo para controles móviles -->
+    <div class="d-flex align-items-center mobile-controls-container">
+      <!-- Carrito móvil -->
+      <div class="nav-item-mobile position-relative me-2"> <!-- me-2 = margin-right pequeño -->
+        <a class="nav-link text-underline p-1" routerLink="/cart" (click)="closeMenu()"> <!-- p-1 = padding pequeño -->
+          <i class="bi bi-cart align-middle"></i>
+          <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{cartItemCount}}</span>
+        </a>
+      </div>
+    
+        <!-- Botón de menú mobiles-->
+      <button class="navbar-toggler p-2" type="button" (click)="toggleMenu()"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarContent"
+      aria-controls="navbarContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation">
+          <span [ngClass]="menuOpen ? 'bi bi-x-lg' : 'navbar-toggler-icon'"></span>
+      </button>
+    </div>
+
+  
+    <!-- Contenido del navbar (rutas definidas en app.routes)-->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+      <ul class="navbar-nav align-items-center"> <!-- Added align-items-center -->
+        <!-- Enlaces principales con subrayado -->
+        <li class="nav-item">
+          <a class="nav-link text-underline" routerLink="/condiciones" (click)="closeMenu()">Condiciones</a>
+        </li>
+
+                <!-- Dropdown de Ubicaciones -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle text-underline"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            (click)="closeMenu()"
+          >
+            Ubicaciones
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" routerLink="/regiones" (click)="closeMenu()">Regiones</a></li>
+            <li><a class="dropdown-item" routerLink="/provincias" (click)="closeMenu()">Provincias</a></li>
+            <li><a class="dropdown-item" routerLink="/comunas" (click)="closeMenu()">Comunas</a></li>
+          </ul>
+        </li>
+
+
+                        <!-- Dropdown de Prendas -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle text-underline"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            (click)="closeMenu()"
+          >
+            Usuarios
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" routerLink="/clientes" (click)="closeMenu()">Clientes</a></li>
+            <li><a class="dropdown-item" routerLink="/empleados" (click)="closeMenu()">Empleados</a></li>
+          </ul>
+        </li>
+
+        <!-- Componente Clave Única -->
+        <app-clave-unica class="nav-item app-clave-unica" (click)="closeMenu()"></app-clave-unica>
+
+        <!-- Separador -->
+        <li class="nav-separator"></li>
+
+        <!-- Ícono de salir -->
+        <li class="nav-item">
+          <a class="nav-link text-underline" routerLink="/salir" (click)="closeMenu()">
+            <i class="bi bi-box-arrow-in-right align-middle"></i>
+          </a>
+        </li>
+
+        <!-- Separador -->
+        <li class="nav-separator"></li>
+
+
+      <!-- Versión desktop (en navbar-nav) -->
+      <li class="nav-item-desktop position-relative me-2">
+      </li>
+      
+      
+      </ul>
+    </div>
+  </div>
+</nav>

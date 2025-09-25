@@ -1,0 +1,35 @@
+.banner {
+  color: #fff; // Texto blanco
+  text-align: center; // Centrado de texto
+  width: 100%; // Ocupa todo el ancho disponible
+  aspect-ratio: 40 / 1; // Proporción más "achatada" (16 de ancho por 3 de alto)
+  display: flex;
+  justify-content: center; // Centra el contenido horizontalmente
+  align-items: center; // Centra el contenido verticalmente
+  overflow: hidden; // Evita que el contenido se desborde
+  position: relative; // Necesario para posicionar el texto
+
+  p {
+    margin: 0; // Elimina márgenes por defecto
+    font-size: 2.5vw; // Tamaño de fuente proporcional al ancho de la pantalla
+    white-space: nowrap; // Evita que el texto se divida en varias líneas
+    overflow: hidden; // Oculta el texto que excede
+    text-overflow: ellipsis; // Muestra puntos suspensivos si el texto es muy largo
+  }
+
+
+  // Ajustes para pantallas grandes (escritorio)
+  @media (min-width: 769px){
+    p {
+      font-weight: 400;
+      font-size: 14px;
+      text-align: left
+    }
+  }
+
+  // Estilos responsivos, versiones móbiles
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+      
