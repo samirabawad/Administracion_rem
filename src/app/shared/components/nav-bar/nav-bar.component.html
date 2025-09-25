@@ -1,111 +1,263 @@
 <nav class="navbar navbar-dark navbar-expand-lg navbar-lg">
   <div class="container-fluid">
-    <!-- Logo -->
+    <!-- Logo mejorado -->
     <a class="navbar-brand" routerLink="/">
       <img src="assets/logo/logo_dicrep_recortado.png" alt="Logo DICREP" class="navbar-logo" />
     </a>
 
-    <!-- Contenedor fijo para controles móviles -->
+    <!-- Contenedor fijo para controles móviles mejorado -->
     <div class="d-flex align-items-center mobile-controls-container">
-      <!-- Carrito móvil -->
-      <div class="nav-item-mobile position-relative me-2">
-        <a class="nav-link text-underline p-1" routerLink="/cart" (click)="closeMenu()">
-          <i class="bi bi-cart align-middle"></i>
-          <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{cartItemCount}}</span>
-        </a>
+      <!-- Notificaciones móvil -->
+      <div class="nav-item-mobile position-relative me-2" *ngIf="isLoggedIn && notificationCount > 0">
+        <button class="btn btn-link nav-notification" (click)="toggleNotifications()">
+          <i class="bi bi-bell"></i>
+          <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">{{notificationCount}}</span>
+        </button>
+      </div>
+
+      <!-- Usuario móvil -->
+      <div class="nav-item-mobile position-relative me-2" *ngIf="isLoggedIn">
+        <button class="btn btn-link nav-user-mobile" (click)="toggleUserMenu()">
+          <i class="bi bi-person-circle"></i>
+        </button>
       </div>
     
-      <!-- Botón de menú móviles-->
-      <button class="navbar-toggler p-2" type="button" (click)="toggleMenu()"
+      <!-- Botón de menú móviles mejorado -->
+      <button class="navbar-toggler" type="button" (click)="toggleMenu()"
       data-bs-toggle="collapse"
       data-bs-target="#navbarContent"
       aria-controls="navbarContent"
-      aria-expanded="false"
+      [attr.aria-expanded]="menuOpen"
       aria-label="Toggle navigation">
-          <span [ngClass]="menuOpen ? 'bi bi-x-lg' : 'navbar-toggler-icon'"></span>
+          <span class="navbar-toggler-icon-custom">
+            <span class="line" [class.active]="menuOpen"></span>
+            <span class="line" [class.active]="menuOpen"></span>
+            <span class="line" [class.active]="menuOpen"></span>
+          </span>
       </button>
     </div>
 
-    <!-- Contenido del navbar -->
-    <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+    <!-- Contenido del navbar mejorado -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarContent" [class.show]="menuOpen">
       <ul class="navbar-nav align-items-center">
         
-        <!-- Dropdown de Gestión de Bienes (NUEVO) -->
+        <!-- Dropdown de Gestión de Bienes MEJORADO -->
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle text-underline"
-            href="#"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-            (click)="closeMenu()"
-          >
+          <a class="nav-link dropdown-toggle text-underline"
+             href="#"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false"
+             (click)="closeMenu()">
             <i class="bi bi-gem me-1"></i>Gestión de Bienes
           </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
+          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-enhanced">
+            <li class="dropdown-header">
+              <i class="bi bi-collection me-2"></i>Operaciones
+            </li>
             <li>
-              <a class="dropdown-item" routerLink="/extraccion-planilla" (click)="closeMenu()">
-                <i class="bi bi-download me-2"></i>Extraer Planilla Bienes
+              <a class="dropdown-item enhanced" routerLink="/extraccion-planilla" (click)="closeMenu()">
+                <div class="dropdown-icon">
+                  <i class="bi bi-download"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Extraer Planilla</div>
+                  <div class="dropdown-desc">Exportar bienes nuevos</div>
+                </div>
               </a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/importacion-resultados" (click)="closeMenu()">
-                <i class="bi bi-upload me-2"></i>Importar Resultados
+              <a class="dropdown-item enhanced" routerLink="/importacion-resultados" (click)="closeMenu()">
+                <div class="dropdown-icon">
+                  <i class="bi bi-upload"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Importar Resultados</div>
+                  <div class="dropdown-desc">Cargar resultados de subastas</div>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">
+              <i class="bi bi-gear-fill me-2"></i>Configuración
+            </li>
+            <li>
+              <a class="dropdown-item enhanced" routerLink="/configuracion-incrementos" (click)="closeMenu()">
+                <div class="dropdown-icon">
+                  <i class="bi bi-gear"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Config. Incrementos</div>
+                  <div class="dropdown-desc">Gestionar incrementos y porcentajes</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item enhanced" routerLink="/datos-bancarios" (click)="closeMenu()">
+                <div class="dropdown-icon">
+                  <i class="bi bi-bank"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Datos Bancarios</div>
+                  <div class="dropdown-desc">Actualizar info bancaria</div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Dropdown de Usuarios MEJORADO -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-underline"
+             href="#"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false"
+             (click)="closeMenu()">
+            <i class="bi bi-people me-1"></i>Usuarios
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-enhanced">
+            <li class="dropdown-header">
+              <i class="bi bi-person-gear me-2"></i>Gestión de Personal
+            </li>
+            <li>
+              <a class="dropdown-item enhanced" routerLink="/empleados" (click)="closeMenu()">
+                <div class="dropdown-icon">
+                  <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Empleados</div>
+                  <div class="dropdown-desc">Usuarios del sistema</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item enhanced" routerLink="/clientes" (click)="closeMenu()">
+                <div class="dropdown-icon">
+                  <i class="bi bi-person-heart"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Clientes</div>
+                  <div class="dropdown-desc">Gestionar comitentes</div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Dropdown de Ubicaciones MEJORADO -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-underline"
+             href="#"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false"
+             (click)="closeMenu()">
+            <i class="bi bi-geo-alt me-1"></i>Ubicaciones
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" routerLink="/regiones" (click)="closeMenu()">
+              <i class="bi bi-map me-2"></i>Regiones
+            </a></li>
+            <li><a class="dropdown-item" routerLink="/provincias" (click)="closeMenu()">
+              <i class="bi bi-signpost me-2"></i>Provincias
+            </a></li>
+            <li><a class="dropdown-item" routerLink="/comunas" (click)="closeMenu()">
+              <i class="bi bi-house me-2"></i>Comunas
+            </a></li>
+          </ul>
+        </li>
+
+        <!-- Notificaciones (Desktop) -->
+        <li class="nav-item dropdown d-none d-lg-block" *ngIf="isLoggedIn">
+          <a class="nav-link position-relative" 
+             href="#" 
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            <i class="bi bi-bell"></i>
+            <span class="badge bg-danger notification-badge" *ngIf="notificationCount > 0">
+              {{notificationCount > 99 ? '99+' : notificationCount}}
+            </span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+            <div class="dropdown-header notification-header">
+              <span><i class="bi bi-bell me-2"></i>Notificaciones</span>
+              <button class="btn btn-sm btn-link text-primary p-0" (click)="clearAllNotifications()">
+                <small>Limpiar</small>
+              </button>
+            </div>
+            <div class="notification-list" *ngIf="notifications.length > 0">
+              <div class="dropdown-item notification-item" *ngFor="let notification of notifications; let i = index">
+                <div class="notification-content">
+                  <div class="notification-title">{{notification.title}}</div>
+                  <div class="notification-text">{{notification.message}}</div>
+                  <small class="notification-time">{{notification.time}}</small>
+                </div>
+                <button class="btn btn-sm btn-link notification-remove" (click)="removeNotification(i)">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+            <div class="notification-empty" *ngIf="notifications.length === 0">
+              <i class="bi bi-bell-slash"></i>
+              <span>No hay notificaciones</span>
+            </div>
+          </div>
+        </li>
+
+        <!-- Componente Clave Única / Usuario logueado -->
+        <li class="nav-item dropdown" *ngIf="isLoggedIn; else claveUnica">
+          <a class="nav-link dropdown-toggle d-flex align-items-center text-underline"
+             href="#"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            <span class="d-none d-xl-inline">{{userName || 'Usuario'}}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark user-dropdown">
+            <li class="dropdown-header user-info">
+              <i class="bi bi-person-circle user-avatar"></i>
+              <div class="user-details">
+                <div class="user-name">{{userName || 'Usuario'}}</div>
+                <small class="user-role">{{userRole || 'Empleado'}}</small>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" routerLink="/perfil" (click)="closeMenu()">
+                <i class="bi bi-person me-2"></i>Mi Perfil
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/configuracion" (click)="closeMenu()">
+                <i class="bi bi-gear me-2"></i>Configuración
               </a>
             </li>
             <li><hr class="dropdown-divider"></li>
             <li>
-              <a class="dropdown-item" routerLink="/configuracion-incrementos" (click)="closeMenu()">
-                <i class="bi bi-gear me-2"></i>Config. Incrementos
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" routerLink="/datos-bancarios" (click)="closeMenu()">
-                <i class="bi bi-bank me-2"></i>Datos Bancarios
+              <a class="dropdown-item text-danger" href="#" (click)="logout()">
+                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
               </a>
             </li>
           </ul>
         </li>
 
-
-        <!-- Dropdown de Usuarios -->
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle text-underline"
-            href="#"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-            (click)="closeMenu()"
-          >
-            <i class="bi bi-people me-1"></i>Usuarios
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" routerLink="/empleados" (click)="closeMenu()">Empleados</a></li>
-          </ul>
-        </li>
-
-        <!-- Componente Clave Única -->
-        <app-clave-unica class="nav-item app-clave-unica" (click)="closeMenu()"></app-clave-unica>
+        <!-- Template para Clave Única -->
+        <ng-template #claveUnica>
+          <app-clave-unica class="nav-item app-clave-unica" (click)="closeMenu()"></app-clave-unica>
+        </ng-template>
 
         <!-- Separador -->
-        <li class="nav-separator"></li>
-
-        <!-- Ícono de salir -->
-        <li class="nav-item">
-          <a class="nav-link text-underline" routerLink="/salir" (click)="closeMenu()">
-            <i class="bi bi-box-arrow-in-right align-middle"></i>
-          </a>
-        </li>
-
-        <!-- Separador -->
-        <li class="nav-separator"></li>
-
-        <!-- Versión desktop -->
-        <li class="nav-item-desktop position-relative me-2">
-        </li>
-      
+        <li class="nav-separator d-none d-lg-block"></li>
+        
       </ul>
     </div>
   </div>
 </nav>
+
+<!-- Overlay para móviles -->
+<div class="mobile-overlay" 
+     *ngIf="menuOpen" 
+     (click)="closeMenu()"></div>
