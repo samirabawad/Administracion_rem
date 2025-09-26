@@ -1,0 +1,60 @@
+<!-- src/app/features/home/components/home/home.component.html -->
+<div class="hero-section">
+  <!-- Módulos Principales -->
+  <section class="modules-section py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="section-title">Módulos del Sistema</h2>
+        <p class="section-subtitle">Accede rápidamente a las funcionalidades principales</p>
+      </div>
+      <div class="row g-4">
+        <!-- Gestión de Bienes -->
+        <div class="col-lg-4 col-md-6">
+          <div class="module-card" routerLink="/extraccion-planilla">
+            <div class="module-icon">
+              <i class="bi bi-gem"></i>
+            </div>
+            <h4>Gestión de Bienes</h4>
+            <p>Extraer planillas, importar resultados y configurar incrementos para las subastas.</p>
+            <div class="module-actions">
+              <span class="action-link">Extraer Planilla <i class="bi bi-arrow-right"></i></span>
+              <span class="action-link">Importar Resultados <i class="bi bi-arrow-right"></i></span>
+              <span class="action-link">Config. Incrementos <i class="bi bi-arrow-right"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gestión de Usuarios -->
+        <div class="col-lg-4 col-md-6">
+          <div class="module-card" routerLink="/empleados">
+            <div class="module-icon">
+              <i class="bi bi-people"></i>
+            </div>
+            <h4>Gestión de Usuarios</h4>
+            <p>Administrar empleados, permisos y configuraciones de acceso al sistema.</p>
+            <div class="module-actions">
+              <span class="action-link">Empleados <i class="bi bi-arrow-right"></i></span>
+              <span class="action-link">Permisos <i class="bi bi-arrow-right"></i></span>
+              <span class="action-link">Auditoría <i class="bi bi-arrow-right"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos Bancarios -->
+        <div class="col-lg-4 col-md-6">
+          <div class="module-card" routerLink="/datos-bancarios">
+            <div class="module-icon">
+              <i class="bi bi-bank"></i>
+            </div>
+            <h4>Datos Bancarios</h4>
+            <p>Actualizar y gestionar la información bancaria de los comitentes.</p>
+            <div class="module-actions">
+              <span class="action-link">Actualizar Datos <i class="bi bi-arrow-right"></i></span>
+              <span class="action-link">Verificar Info <i class="bi bi-arrow-right"></i></span>
+              <span class="action-link">Generar Reportes <i class="bi bi-arrow-right"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>

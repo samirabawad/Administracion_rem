@@ -1,8 +1,11 @@
 // src/app/features/Usuarios/Empleados/Empleados/empleados.component.ts
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { EmpleadosService } from '../empleados.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { Subject, takeUntil } from 'rxjs';
 
 interface EmpleadoMejorado {
   empId: number;
@@ -29,6 +32,11 @@ interface EmpleadoMejorado {
   nivelAcceso: number;
   forzarCambioPassword?: boolean;
   seleccionado?: boolean;
+  /*
+  // Propiedades adicionales para compatibilidad
+  usuarioCreacion?: string;
+  fechaCreacion?: Date;
+  */
 }
 
 interface Perfil {
@@ -64,8 +72,30 @@ interface FiltrosEmpleados {
   templateUrl: './empleados.component.html',
   styleUrls: ['./empleados.component.scss']
 })
-export class EmpleadosComponent implements OnInit, AfterViewChecked {
+
+//export class EmpleadosComponent implements OnInit, AfterViewChecked, OnDestroy
+export class EmpleadosComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('empUsuario') empUsuarioInput!: ElementRef<HTMLInputElement>;
+
+    ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /*
+  //Lo comento porque esta duplicado, vere si funciona asi primero:
+    ngAfterViewChecked(): void {
+    if (this.modalVisible && !this.modalAbiertoPrev) {
+      this.empUsuarioInput?.nativeElement.focus();
+      this.modalAbiertoPrev = true;
+    }
+    if (!this.modalVisible && this.modalAbiertoPrev) {
+      this.modalAbiertoPrev = false;
+    }
+  }
+  
+  */
+  private destroy$ = new Subject<void>();
 
   // Modal
   modalVisible = false;
@@ -102,168 +132,107 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
     sucursal: ''
   };
 
+  constructor(
+    private empleadosService: EmpleadosService,
+    private authService: AuthService
+  ) {}
+
   ngOnInit(): void {
-    this.cargarDatosMock();
+    this.cargarDatos();
     this.aplicarFiltros();
   }
+  
+  // Loading states
+  cargandoDatos = false;
 
-  private cargarDatosMock(): void {
+  private cargarDatos(): void {
+    this.cargandoDatos = true;
+
+    // Verificar si el servicio está disponible
+    if (!this.empleadosService) {
+      console.warn('EmpleadosService no está disponible, usando datos mock');
+      this.cargarDatosAuxiliares();
+      return;
+    }
+
+    // Cargar empleados
+    this.empleadosService.getEmpleados()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (empleados) => {
+          this.empleados = empleados.map((emp: any): EmpleadoMejorado => ({
+            ...emp,
+            seleccionado: false,
+            empFechaLog: emp.empFechaLog ? new Date(emp.empFechaLog) : undefined,
+            empFechaExp: emp.empFechaExp ? new Date(emp.empFechaExp) : undefined
+          }));
+          this.aplicarFiltros();
+          this.cargandoDatos = false;
+        },
+        error: (error) => {
+          this.cargandoDatos = false;
+          console.error('Error cargando empleados:', error);
+          
+          Swal.fire({
+            title: 'Advertencia',
+            text: 'No se pudieron cargar los empleados desde el servidor. Mostrando datos de ejemplo.',
+            icon: 'warning'
+          });
+        }
+      });
+
+    // Cargar datos auxiliares
+    this.cargarDatosAuxiliares();
+  }
+
+
+  private cargarDatosAuxiliares(): void {
+    if (!this.empleadosService) {
+      return;
+    }
+
     // Cargar perfiles
-    this.perfiles = [
-      { perfilId: 1, perfilNombre: 'Administrador', perfilDescripcion: 'Acceso completo al sistema' },
-      { perfilId: 2, perfilNombre: 'Supervisor', perfilDescripcion: 'Supervisión de operaciones' },
-      { perfilId: 3, perfilNombre: 'Operador', perfilDescripcion: 'Operaciones básicas' },
-      { perfilId: 4, perfilNombre: 'Auditor', perfilDescripcion: 'Solo lectura y reportes' }
-    ];
+    this.empleadosService.getPerfiles()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (perfiles) => {
+          this.perfiles = perfiles;
+        },
+        error: (error) => {
+          console.error('Error cargando perfiles:', error);
+        }
+      });
 
     // Cargar sucursales
-    this.sucursales = [
-      { sucursalId: 1, sucursalNombre: 'Casa Central', sucursalCiudad: 'Santiago' },
-      { sucursalId: 2, sucursalNombre: 'Sucursal Norte', sucursalCiudad: 'Antofagasta' },
-      { sucursalId: 3, sucursalNombre: 'Sucursal Sur', sucursalCiudad: 'Concepción' },
-      { sucursalId: 4, sucursalNombre: 'Sucursal Centro', sucursalCiudad: 'Valparaíso' }
-    ];
+    this.empleadosService.getSucursales()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sucursales) => {
+          this.sucursales = sucursales;
+        },
+        error: (error) => {
+          console.error('Error cargando sucursales:', error);
+        }
+      });
 
     // Cargar permisos
-    this.permisosDisponibles = [
-      { permisoId: 1, permisoNombre: 'Gestión de Bienes', permisoDescripcion: 'Crear, editar y eliminar bienes', asignado: false },
-      { permisoId: 2, permisoNombre: 'Gestión de Usuarios', permisoDescripcion: 'Administrar empleados y clientes', asignado: false },
-      { permisoId: 3, permisoNombre: 'Configuración de Sistema', permisoDescripcion: 'Acceso a configuraciones generales', asignado: false },
-      { permisoId: 4, permisoNombre: 'Reportes Avanzados', permisoDescripcion: 'Generar y exportar reportes', asignado: false },
-      { permisoId: 5, permisoNombre: 'Auditoría', permisoDescripcion: 'Ver logs y auditorías del sistema', asignado: false }
-    ];
-
-    // Cargar empleados mock
-    this.empleados = [
-      {
-        empId: 1,
-        empUsuario: 'admin',
-        empRut: '12.345.678-9',
-        empNombre: 'Juan Carlos',
-        empApellido: 'Rodríguez',
-        empSegundoApellido: 'Silva',
-        empCorreo: 'juan.rodriguez@dicrep.cl',
-        empTelefono: '+56 9 8765 4321',
-        empAnexo: '101',
-        empCargo: 'Administrador de Sistemas',
-        empActivo: true,
-        empFechaLog: new Date('2025-01-24T09:15:00'),
-        perfilId: 1,
-        perfilNombre: 'Administrador',
-        sucursalId: 1,
-        sucursalNombre: 'Casa Central',
-        authMethod: 0,
-        nivelAcceso: 4,
-        seleccionado: false
-      },
-      {
-        empId: 2,
-        empUsuario: 'mgarcia',
-        empRut: '15.678.901-2',
-        empNombre: 'María Elena',
-        empApellido: 'García',
-        empSegundoApellido: 'Mendoza',
-        empCorreo: 'maria.garcia@dicrep.cl',
-        empTelefono: '+56 2 2345 6789',
-        empAnexo: '102',
-        empCargo: 'Supervisora de Ventas',
-        empActivo: true,
-        empFechaLog: new Date('2025-01-24T08:30:00'),
-        perfilId: 2,
-        perfilNombre: 'Supervisor',
-        sucursalId: 1,
-        sucursalNombre: 'Casa Central',
-        authMethod: 1,
-        nivelAcceso: 3,
-        seleccionado: false
-      },
-      {
-        empId: 3,
-        empUsuario: 'plopez',
-        empRut: '18.234.567-8',
-        empNombre: 'Pedro Antonio',
-        empApellido: 'López',
-        empCorreo: 'pedro.lopez@dicrep.cl',
-        empTelefono: '+56 9 1234 5678',
-        empCargo: 'Operador de Subastas',
-        empActivo: true,
-        empFechaLog: new Date('2025-01-23T16:45:00'),
-        perfilId: 3,
-        perfilNombre: 'Operador',
-        sucursalId: 2,
-        sucursalNombre: 'Sucursal Norte',
-        authMethod: 0,
-        nivelAcceso: 2,
-        seleccionado: false
-      },
-      {
-        empId: 4,
-        empUsuario: 'asilva',
-        empRut: '20.111.222-3',
-        empNombre: 'Ana Sofía',
-        empApellido: 'Silva',
-        empSegundoApellido: 'Torres',
-        empCorreo: 'ana.silva@dicrep.cl',
-        empTelefono: '+56 9 9876 5432',
-        empAnexo: '205',
-        empCargo: 'Auditora',
-        empActivo: true,
-        empFechaLog: new Date('2025-01-24T07:20:00'),
-        empFechaExp: new Date('2025-03-15'), // Próximo a vencer
-        perfilId: 4,
-        perfilNombre: 'Auditor',
-        sucursalId: 3,
-        sucursalNombre: 'Sucursal Sur',
-        authMethod: 2,
-        nivelAcceso: 2,
-        seleccionado: false
-      },
-      {
-        empId: 5,
-        empUsuario: 'lhernandez',
-        empRut: '16.789.012-3',
-        empNombre: 'Luis Fernando',
-        empApellido: 'Hernández',
-        empCorreo: 'luis.hernandez@dicrep.cl',
-        empCargo: 'Operador Junior',
-        empActivo: false, // Inactivo
-        empFechaLog: new Date('2025-01-20T12:30:00'),
-        perfilId: 3,
-        perfilNombre: 'Operador',
-        sucursalId: 4,
-        sucursalNombre: 'Sucursal Centro',
-        authMethod: 0,
-        nivelAcceso: 1,
-        seleccionado: false
-      },
-      {
-        empId: 6,
-        empUsuario: 'cmoreno',
-        empRut: '19.456.789-0',
-        empNombre: 'Carmen Patricia',
-        empApellido: 'Moreno',
-        empSegundoApellido: 'López',
-        empCorreo: 'carmen.moreno@dicrep.cl',
-        empTelefono: '+56 9 5555 6666',
-        empAnexo: '301',
-        empCargo: 'Supervisora Regional',
-        empActivo: true,
-        empFechaLog: new Date('2025-01-24T10:15:00'),
-        empFechaExp: new Date('2025-02-28'), // Próximo a vencer
-        perfilId: 2,
-        perfilNombre: 'Supervisor',
-        sucursalId: 2,
-        sucursalNombre: 'Sucursal Norte',
-        authMethod: 1,
-        nivelAcceso: 3,
-        seleccionado: false
-      }
-    ];
+    this.empleadosService.getPermisos()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (permisos) => {
+          this.permisosDisponibles = permisos.map(p => ({...p, asignado: false}));
+        },
+        error: (error) => {
+          console.error('Error cargando permisos:', error);
+        }
+      });
   }
+
 
   get perfilSeleccionado(): Perfil | undefined {
     return this.perfiles.find(p => p.perfilId === this.nuevoEmpleado.perfilId);
   }
+
 
   aplicarFiltros(): void {
     this.empleadosFiltrados = this.empleados.filter(empleado => {
@@ -304,6 +273,8 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
     });
   }
 
+
+
   limpiarFiltros(): void {
     this.filtros = {
       busqueda: '',
@@ -314,11 +285,13 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
     this.aplicarFiltros();
   }
 
+
   contarPorEstado(estado: 'activos' | 'inactivos'): number {
     return this.empleadosFiltrados.filter(e => 
       estado === 'activos' ? e.empActivo : !e.empActivo
     ).length;
   }
+
 
   contarProximosVencer(): number {
     return this.empleadosFiltrados.filter(e => 
@@ -326,11 +299,13 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
     ).length;
   }
 
+
   estaProximoVencer(fechaExp: Date): boolean {
     const hoy = new Date();
     const diasRestantes = Math.ceil((fechaExp.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
     return diasRestantes <= 30 && diasRestantes > 0;
   }
+
 
   obtenerTipoAuth(authMethod: number): string {
     const tipos = {
@@ -340,6 +315,7 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
     };
     return tipos[authMethod as keyof typeof tipos] || 'Desconocido';
   }
+
 
   abrirModal(): void {
     this.modalVisible = true;
@@ -367,6 +343,7 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
     document.body.style.overflow = '';
   }
 
+
   editarEmpleado(empleado: EmpleadoMejorado): void {
     this.modoEdicion = true;
     this.empleadoEditandoId = empleado.empId;
@@ -385,6 +362,8 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
       this.nuevoEmpleado.empUsuario = `${nombre.charAt(0)}${apellido}`;
     }
   }
+
+
 
   guardarEmpleado(): void {
     if (!this.validarFormulario()) {
@@ -447,6 +426,8 @@ export class EmpleadosComponent implements OnInit, AfterViewChecked {
 
     return true;
   }
+
+  
 
   toggleEstadoEmpleado(empleado: EmpleadoMejorado): void {
     const accion = empleado.empActivo ? 'desactivar' : 'activar';

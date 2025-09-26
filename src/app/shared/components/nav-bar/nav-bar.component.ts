@@ -1,9 +1,11 @@
 // src/app/shared/components/nav-bar/nav-bar.component.ts
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { ClaveUnicaComponent } from '../clave-unica/clave-unica.component';
-import { filter } from 'rxjs/operators';
+import { AuthService } from '../../../core/services/auth.service';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 interface Notification {
   id: number;
@@ -21,47 +23,84 @@ interface Notification {
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss'
 })
-export class NavBarComponent implements OnInit {
+export class NavBarComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
-  // Propiedades existentes
+  // Propiedades de estado
   isLoggedIn = false;
-  cartItemCount = 0;
   menuOpen: boolean = false;
 
-  // Nuevas propiedades para funcionalidades mejoradas
+  // Datos del usuario
   userName = '';
   userRole = '';
   userEmail = '';
+  currentUser: any = null;
+
+  // Notificaciones
   notificationCount = 0;
   notifications: Notification[] = [];
   notificationsOpen = false;
   userMenuOpen = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    // Simular datos de usuario (en producción vendría del servicio de auth)
-    this.loadMockUserData();
-    this.loadMockNotifications();
+    // Suscribirse al estado de autenticación
+    this.authService.isAuthenticated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(isAuth => {
+        this.isLoggedIn = isAuth;
+        if (!isAuth) {
+          this.clearUserData();
+        }
+      });
+
+    // Suscribirse a los datos del usuario
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+        if (user) {
+          this.updateUserData(user);
+          this.loadNotifications(); // Cargar notificaciones cuando hay usuario
+        }
+      });
 
     // Cerrar menús al navegar
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe(() => {
       this.closeMenu();
       this.closeAllDropdowns();
     });
   }
 
-  private loadMockUserData(): void {
-    // Simular usuario logueado (cambiar según tu lógica de auth)
-    this.isLoggedIn = true; // Cambiar a false para probar Clave Única
-    this.userName = 'Juan Rodríguez';
-    this.userRole = 'Administrador';
-    this.userEmail = 'juan.rodriguez@dicrep.cl';
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  private loadMockNotifications(): void {
+  private updateUserData(user: any): void {
+    this.userName = `${user.empNombre} ${user.empApellido}`;
+    this.userRole = user.perfilNombre || 'Usuario';
+    this.userEmail = user.empCorreo || '';
+  }
+
+  private clearUserData(): void {
+    this.userName = '';
+    this.userRole = '';
+    this.userEmail = '';
+    this.currentUser = null;
+    this.notifications = [];
+    this.notificationCount = 0;
+  }
+
+  private loadNotifications(): void {
+    // TODO: Implementar carga real de notificaciones desde el backend
     this.notifications = [
       {
         id: 1,
@@ -78,14 +117,6 @@ export class NavBarComponent implements OnInit {
         time: 'hace 15 min',
         type: 'success',
         read: false
-      },
-      {
-        id: 3,
-        title: 'Error en importación',
-        message: 'La importación de resultados falló. Revisar archivo.',
-        time: 'hace 1 hora',
-        type: 'error',
-        read: false
       }
     ];
     this.updateNotificationCount();
@@ -95,7 +126,7 @@ export class NavBarComponent implements OnInit {
     this.notificationCount = this.notifications.filter(n => !n.read).length;
   }
 
-  // Métodos existentes mejorados
+  // Métodos de navegación y menú
   closeMenu(): void {
     this.menuOpen = false;
     const menuElement = document.getElementById('navbarContent');
@@ -109,25 +140,19 @@ export class NavBarComponent implements OnInit {
     this.closeAllDropdowns();
   }
 
-  // Nuevos métodos para funcionalidades mejoradas
   private closeAllDropdowns(): void {
     this.notificationsOpen = false;
     this.userMenuOpen = false;
   }
 
+  // Métodos de notificaciones
   toggleNotifications(): void {
     this.notificationsOpen = !this.notificationsOpen;
     this.userMenuOpen = false;
     
     if (this.notificationsOpen) {
-      // Marcar notificaciones como leídas cuando se abren
       setTimeout(() => this.markNotificationsAsRead(), 1000);
     }
-  }
-
-  toggleUserMenu(): void {
-    this.userMenuOpen = !this.userMenuOpen;
-    this.notificationsOpen = false;
   }
 
   markNotificationsAsRead(): void {
@@ -148,54 +173,37 @@ export class NavBarComponent implements OnInit {
     this.notificationsOpen = false;
   }
 
+  // Métodos de usuario
+  toggleUserMenu(): void {
+    this.userMenuOpen = !this.userMenuOpen;
+    this.notificationsOpen = false;
+  }
+
   logout(): void {
-    // Simular logout
-    this.isLoggedIn = false;
-    this.userName = '';
-    this.userRole = '';
-    this.userEmail = '';
-    this.notifications = [];
-    this.notificationCount = 0;
+    this.authService.logout();
     this.closeMenu();
     this.closeAllDropdowns();
-    
-    // Redirigir al home o login
-    this.router.navigate(['/']);
-    
-    // Mostrar mensaje de confirmación (opcional)
-    console.log('Sesión cerrada correctamente');
   }
 
-  // Simular login exitoso (para testing)
-  simulateLogin(): void {
-    this.isLoggedIn = true;
-    this.loadMockUserData();
-    this.loadMockNotifications();
-  }
-
-  // Métodos para manejo de permisos (implementar según tu lógica)
+  // Métodos de permisos
   hasPermission(permission: string): boolean {
-    // Implementar lógica de permisos
-    return true; // Por ahora retorna true para todos
+    return this.authService.hasPermission(permission);
   }
 
-  // Cerrar dropdowns al hacer click fuera
+  // Event listeners
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;
     
-    // Cerrar notificaciones si click fuera
     if (this.notificationsOpen && !target.closest('.notification-dropdown') && !target.closest('[data-bs-toggle="dropdown"]')) {
       this.notificationsOpen = false;
     }
 
-    // Cerrar menú de usuario si click fuera
     if (this.userMenuOpen && !target.closest('.user-dropdown') && !target.closest('[data-bs-toggle="dropdown"]')) {
       this.userMenuOpen = false;
     }
   }
 
-  // Cerrar menú móvil con Escape
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKey(event: KeyboardEvent): void {
     if (this.menuOpen) {
@@ -204,7 +212,6 @@ export class NavBarComponent implements OnInit {
     this.closeAllDropdowns();
   }
 
-  // Prevenir scroll del body cuando el menú móvil está abierto
   @HostListener('window:resize', ['$event'])
   onResize(): void {
     if (window.innerWidth > 991 && this.menuOpen) {

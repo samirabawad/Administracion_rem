@@ -1,41 +1,82 @@
+// src/app/features/Usuarios/Empleados/empleados.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BaseHttpService } from '../../../core/services/base-http.service.ts.service';
 import { Empleado } from './empleados.model';
-import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EmpleadosService {
-  private apiUrl = `${environment.apiUrl}/empleado`;
-  
-  constructor(private http: HttpClient) {}
+export class EmpleadosService extends BaseHttpService {
+  private endpoint = '/empleado';
 
+  /**
+   * Obtener todos los empleados
+   */
   getEmpleados(): Observable<Empleado[]> {
-    return this.http.get<Empleado[]>(this.apiUrl).pipe(
-      tap(data => console.log('Empleados recibidos:', data))
-    );
+    return this.get<Empleado[]>(this.endpoint);
   }
 
-  agregarEmpleado(empleado: Empleado): Observable<Empleado> {
-    return this.http.post<Empleado>(this.apiUrl, empleado).pipe(
-      tap(data => console.log('Empleado creado:', data))
-    );
+  /**
+   * Obtener empleado por ID
+   */
+  getEmpleadoById(empId: number): Observable<Empleado> {
+    return this.get<Empleado>(`${this.endpoint}/${empId}`);
   }
 
-  actualizarEmpleado(empleado: Empleado): Observable<Empleado> {
-    const url = `${this.apiUrl}/${empleado.empId}`;
-    return this.http.put<Empleado>(url, empleado).pipe(
-      tap(data => console.log('Empleado actualizado:', data))
-    );
+  /**
+   * Crear nuevo empleado
+   */
+  crearEmpleado(empleado: Partial<Empleado>): Observable<Empleado> {
+    return this.post<Empleado>(this.endpoint, empleado);
   }
 
+  /**
+   * Actualizar empleado existente
+   */
+  actualizarEmpleado(empId: number, empleado: Partial<Empleado>): Observable<Empleado> {
+    return this.put<Empleado>(`${this.endpoint}/${empId}`, empleado);
+  }
+
+  /**
+   * Eliminar empleado
+   */
   eliminarEmpleado(empId: number): Observable<void> {
-    const url = `${this.apiUrl}/${empId}`;
-    return this.http.delete<void>(url).pipe(
-      tap(() => console.log(`Empleado con ID ${empId} eliminado`))
-    );
+    return this.delete<void>(`${this.endpoint}/${empId}`);
+  }
+
+  /**
+   * Cambiar estado del empleado (activar/desactivar)
+   */
+  cambiarEstadoEmpleado(empId: number, activo: boolean): Observable<Empleado> {
+    return this.put<Empleado>(`${this.endpoint}/${empId}/estado`, { activo });
+  }
+
+  /**
+   * Resetear contraseña
+   */
+  resetearPassword(empId: number): Observable<{ password: string }> {
+    return this.post<{ password: string }>(`${this.endpoint}/${empId}/reset-password`, {});
+  }
+
+  /**
+   * Obtener perfiles disponibles
+   */
+  getPerfiles(): Observable<any[]> {
+    return this.get<any[]>('/perfil');
+  }
+
+  /**
+   * Obtener sucursales disponibles
+   */
+  getSucursales(): Observable<any[]> {
+    return this.get<any[]>('/sucursal');
+  }
+
+  /**
+   * Obtener permisos disponibles
+   */
+  getPermisos(): Observable<any[]> {
+    return this.get<any[]>('/permiso');
   }
 }

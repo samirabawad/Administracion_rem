@@ -1,7 +1,24 @@
+// src/app/environments/environment.development.ts
 export const environment = {
-    clientIdClaveUnica: '4c73134c372a4e4c9739c39e72963d33',
-    redirecUriClaveUnica: 'https://adminrematestest.tiarica.cl', //luego anteponerlo del esquema https//:
-    uriLogoutClaveUnica: 'adminrematestest.tiarica.cl',
     production: false,
-    apiUrl: 'http://localhost:5096/api' // Usando HTTPS desde desarrollo
+    
+    // API Configuration
+    apiUrl: 'http://localhost:5096/api',
+    
+    // Clave Única Configuration
+    clientIdClaveUnica: '12f1aa2c813b4fed97212f76475b48ba',
+    redirecUriClaveUnica: 'https://adminrematestest.tiarica.cl', // Agregar /callback
+    uriLogoutClaveUnica: 'adminrematestest.tiarica.cl',
+    
+    // Feature Flags
+    enableMockData: true, // Para desarrollo con datos simulados
+    enableDebugMode: true,
+    
+    // Upload Configuration
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+    allowedFileTypes: ['.xlsx', '.xls'],
+    
+    // Pagination
+    defaultPageSize: 10,
+    maxPageSize: 100
 };
