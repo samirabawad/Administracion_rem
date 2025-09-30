@@ -3,7 +3,7 @@ export const environment = {
     production: false,
     
     // API Configuration
-    apiUrl: 'http://localhost:5096/api',
+    apiUrl: 'https://apirematestest.tiarica.cl/api',
     
     // Clave Única Configuration
     clientIdClaveUnica: '12f1aa2c813b4fed97212f76475b48ba',
